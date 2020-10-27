@@ -4,6 +4,24 @@ use serenity::prelude::*;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 
+fn main() {
+    // Configure the client with your Discord bot token in the environment.
+    let token = "NzYzMjMyMTE5ODQwNTcxNDIy.X30tTQ.gXdMOWJpuBxRIJqIsbMg6BO7FvM";
+
+    // Create a new instance of the Client, logging in as a bot. This will
+    // automatically prepend your bot token with "Bot ", which is a requirement
+    // by Discord for bot users.
+    let mut client = Client::new(&token, Handler).expect("Err creating client");
+
+    // Finally, start a single shard, and start listening to events.
+    //
+    // Shards will automatically attempt to reconnect, and will perform
+    // exponential backoff until it reconnects.
+    if let Err(why) = client.start() {
+        println!("Client error: {:?}", why);
+    }
+}
+
 struct Handler;
 
 impl EventHandler for Handler {
@@ -33,23 +51,5 @@ impl EventHandler for Handler {
     // In this case, just print what the current user's username is.
     fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
-    }
-}
-
-fn main() {
-    // Configure the client with your Discord bot token in the environment.
-    let token = "NzYzMjMyMTE5ODQwNTcxNDIy.X30tTQ.gXdMOWJpuBxRIJqIsbMg6BO7FvM";
-
-    // Create a new instance of the Client, logging in as a bot. This will
-    // automatically prepend your bot token with "Bot ", which is a requirement
-    // by Discord for bot users.
-    let mut client = Client::new(&token, Handler).expect("Err creating client");
-
-    // Finally, start a single shard, and start listening to events.
-    //
-    // Shards will automatically attempt to reconnect, and will perform
-    // exponential backoff until it reconnects.
-    if let Err(why) = client.start() {
-        println!("Client error: {:?}", why);
     }
 }
