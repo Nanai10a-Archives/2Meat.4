@@ -12,12 +12,14 @@ use threadpool::ThreadPool;
 
 #[tokio::main]
 async fn main() {
+    dotenv::dotenv().ok();
+
     simplelog::SimpleLogger::init(LevelFilter::Info, Config::default()).expect("err!");
 
     info!("initialized env_logger");
 
     let mut client =
-        ClientBuilder::new("")
+        ClientBuilder::new(std::env::var("DISCORD_TOKEN").expect("Error: token not found!"))
             .guild_subscriptions(true)
             .event_handler(EventPoster)
             .await;
