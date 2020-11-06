@@ -13,6 +13,7 @@ mongodb = "*"
 log = "*"
 simplelog = "*"
 tokio = { version = "0.2.*", features = ["macros"] }
+dotenv = "*"
 
 [dependencies.serenity]
 version = "0.9.*"
