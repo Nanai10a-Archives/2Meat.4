@@ -1,0 +1,26 @@
+[package]
+name = "two_meat_rust"
+version = "0.1.0"
+authors = ["Nanai10a <Nanai10a@tutanota.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+threadpool = "*"
+serde_json = "*"
+mongodb = "*"
+tokio = { version = "0.2.*", features = ["macros"] }
+dotenv = "*"
+
+[dependencies.serenity]
+version = "0.9.*"
+default-features = false
+features = [
+    "client",
+    "gateway",
+    "rustls_backend",
+    "model",
+#    "framework",
+#    "standard_framework"
+]
