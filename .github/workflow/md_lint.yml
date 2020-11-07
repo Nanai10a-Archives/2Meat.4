@@ -1,0 +1,26 @@
+name: md_lint
+
+on: 
+    push:
+        branches: master
+    pull_request:
+
+jobs:
+    md_lint:
+        name: My Markdown Linter
+        runs-on: ubuntu-latest
+        steps:
+            # You may pin to the exact commit or the version.
+            # uses: ruzickap/action-my-markdown-linter@88dc488571a064a6d3271fa6a116c27827e0ffe6
+            - uses: ruzickap/action-my-markdown-linter@v0.0.1
+            # - with:
+                # markdownlint config file
+                # config_file: # optional
+                # Debug mode
+                # debug: # optional
+                # Exclude files or directories
+                # exclude: # optional
+                # Command line parameters for fd command. "exclude" and "search_paths" parameters are ignored if this is set
+                # fd_cmd_params: # optional
+                # Set paths which should be recursively scanned for markdown files (*.md) and linted. By default all "*.md" files are checked
+                # search_paths: # optional
