@@ -6,28 +6,28 @@ on:
   pull_request:
 
 jobs:
-    coverage:
-        runs-on: ubuntu-latest
+  coverage:
+    runs-on: ubuntu-latest
 
-        steps:
-            - uses: actions/checkout@v1
-            - uses: actions-rs/toolchain@v1
-              with:
-                toolchain: nightly
-                override: true
-            - uses: actions-rs/cargo@v1
-              with:
-                command: test
-                args: --all-features --no-fail-fast
-              env:
-                CARGO_INCREMENTAL: '0'
-                RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
-                RUSTDOCFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
-      
-            - uses: actions-rs/grcov@v0.1.5
-              # with:
-              # You may pin to the exact commit or the version.
-              # uses: actions-rs/grcov@bb47b1ed7883a1502fa6875d562727ace2511248
-              # with:
-              # Path to the configuration file (optional, relative to the repository root)
-              # config: # optional, default is .github/actions-rs/grcov.yml
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all-features --no-fail-fast
+        env:
+          CARGO_INCREMENTAL: '0'
+          RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
+          RUSTDOCFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
+
+      - uses: actions-rs/grcov@v0.1.5
+        # with:
+        # You may pin to the exact commit or the version.
+        # uses: actions-rs/grcov@bb47b1ed7883a1502fa6875d562727ace2511248
+        # with:
+        # Path to the configuration file (optional, relative to the repository root)
+        # config: # optional, default is .github/actions-rs/grcov.yml
