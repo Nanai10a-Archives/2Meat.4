@@ -17,6 +17,9 @@
 - on commit
     - [gitmoji](https://gitmoji.carloscuesta.me/)をprefixに使用する
         - commitは1 mojiで表せる単位で分割する
+    - prefixとコメント本文の間にはspaceをはさみましょう
+        - ex) `:tada: こめんと`  
+          preview) :tada: こめんと
     - 末尾には句点をつけましょう.
     - signatureはして.
 - others
