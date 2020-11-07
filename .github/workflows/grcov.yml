@@ -28,9 +28,16 @@ jobs:
           RUSTDOCFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
 
       - uses: actions-rs/grcov@v0.1.5
-        # with:
+        with:
         # You may pin to the exact commit or the version.
         # uses: actions-rs/grcov@bb47b1ed7883a1502fa6875d562727ace2511248
         # with:
         # Path to the configuration file (optional, relative to the repository root)
         # config: # optional, default is .github/actions-rs/grcov.yml
+          command: grcov ./target/debug -t coveralls -s . --token ${{ secrets.CODECOV_TOKEN }} > coveralls.json
+
+      - name: Codecov
+        uses: codecov/codecov-action@v1.0.14
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
