@@ -17,6 +17,9 @@ jobs:
           override: true
       - uses: actions-rs/cargo@v1
         with:
+          commant: clean
+      - uses: actions-rs/cargo@v1
+        with:
           command: test
           args: --all-features --no-fail-fast
         env:
