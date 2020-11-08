@@ -3,12 +3,12 @@
 [![codecov](https://codecov.io/gh/Nanai10a/2Meat-4th/branch/master/graph/badge.svg?token=TQFPUYJE0E)](https://codecov.io/gh/Nanai10a/2Meat-4th)
 
 :sparkles: ***master status*** :sparkles:  
-![build_and_tests](https://github.com/Nanai10a/2Meat-4th/workflows/build_and_tests/badge.svg?branch=master)
+![build](https://github.com/Nanai10a/2Meat-4th/workflows/build/badge.svg?branch=master)
 ![grcov](https://github.com/Nanai10a/2Meat-4th/workflows/grcov/badge.svg?branch=master)
 ![md_lint](https://github.com/Nanai10a/2Meat-4th/workflows/md_lint/badge.svg?branch=master)
 
 :hammer_and_wrench: ***development status*** :hammer_and_wrench:  
-![build_and_tests](https://github.com/Nanai10a/2Meat-4th/workflows/build_and_tests/badge.svg?branch=development)
+![build](https://github.com/Nanai10a/2Meat-4th/workflows/build/badge.svg?branch=development)
 ![grcov](https://github.com/Nanai10a/2Meat-4th/workflows/grcov/badge.svg?branch=development)
 ![md_lint](https://github.com/Nanai10a/2Meat-4th/workflows/md_lint/badge.svg?branch=development)
 
