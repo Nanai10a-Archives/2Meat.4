@@ -36,8 +36,7 @@ jobs:
           # config: # optional, default is .github/actions-rs/grcov.yml
           command: grcov ./target/debug -t coveralls -s . --token ${{ secrets.CODECOV_TOKEN }} > coveralls.json
 
-      - name: Codecov
-        uses: codecov/codecov-action@v1.0.14
+      - uses: codecov/codecov-action@v1.0.14
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
