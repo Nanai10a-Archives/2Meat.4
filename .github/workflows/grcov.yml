@@ -19,7 +19,7 @@ jobs:
 
       - uses: actions-rs/cargo@v1
         with:
-          commant: clean
+          command: clean
 
       - uses: actions-rs/cargo@v1
         with:
