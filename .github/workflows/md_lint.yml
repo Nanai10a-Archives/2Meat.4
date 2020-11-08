@@ -9,6 +9,7 @@ jobs:
   md_lint:
     name: My Markdown Linter
     runs-on: ubuntu-latest
+
     steps:
       # You may pin to the exact commit or the version.
       # uses: ruzickap/action-my-markdown-linter@88dc488571a064a6d3271fa6a116c27827e0ffe6
