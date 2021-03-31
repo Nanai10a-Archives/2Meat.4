@@ -1,12 +1,9 @@
 extern crate two_meat_rust;
 
-use serenity::client::bridge::gateway::GatewayIntents;
+use serenity::async_trait;
 use serenity::client::ClientBuilder;
 use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
 use serenity::prelude::{Context, EventHandler};
-use serenity::{async_trait, Error};
-use threadpool::ThreadPool;
 
 #[tokio::main]
 async fn main() {
