@@ -13,7 +13,7 @@ async fn main() {
     dotenv::dotenv().ok();
 
     let mut client =
-        ClientBuilder::new(std::env::var("DISCORD_TOKEN").expect("Error: token not found!"))
+        match ClientBuilder::new(std::env::var("DISCORD_TOKEN").expect("Error: token not found!"))
             .guild_subscriptions(true)
             .event_handler(EventPoster)
             .await
