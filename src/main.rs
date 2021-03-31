@@ -16,20 +16,15 @@ async fn main() {
         ClientBuilder::new(std::env::var("DISCORD_TOKEN").expect("Error: token not found!"))
             .guild_subscriptions(true)
             .event_handler(EventPoster)
-            .await;
+            .await
+        {
+            Ok(client) => client,
+            Err(err) => panic!("{}", err),
+        };
 
-    let mut _client = match client {
-        Ok(ok) => ok,
-        Err(err) => {
-            panic!(err.to_string());
-        }
-    };
-
-    match _client.start().await {
-        Ok(_) => {}
-        Err(err) => {
-            panic!(err.to_string());
-        }
+    match client.start().await {
+        Ok(_) => (),
+        Err(err) => panic!("{}", err),
     }
 }
 
