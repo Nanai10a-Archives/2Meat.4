@@ -1,5 +1,7 @@
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FormattedData {
     pub content: String,
     pub attachments: Vec<Attachments>,
@@ -8,12 +10,14 @@ pub struct FormattedData {
     pub timestamp: DateTime<Utc>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Attachments {
     pub a_type: AttachmentType,
     pub url: String,
     pub binary: Option<Vec<u8>>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AttachmentType {
     Image,
     Audio,
@@ -21,6 +25,7 @@ pub enum AttachmentType {
     Other,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Author {
     pub name: String,
     pub nickname: Option<String>,
@@ -28,11 +33,13 @@ pub struct Author {
     pub place: Place,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AdditionalContent {
     DiscordPlaceInfo,
     // TODO: なんか情報を付け足したい場合はここで 依存がおかしくならない程度に
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Place {
     Discord,
     Twitter,
