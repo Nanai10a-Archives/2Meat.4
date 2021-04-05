@@ -12,6 +12,7 @@ serde_json = "*"
 mongodb = "*"
 tokio = { version = "0.2.*", features = ["macros"] }
 dotenv = "*"
+chrono = "*"
 
 [dependencies.serenity]
 version = "0.9.*"
