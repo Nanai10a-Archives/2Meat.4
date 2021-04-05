@@ -1,3 +1,5 @@
+use chrono::{DateTime, Utc};
+
 pub struct FormattedData {
     pub content: String,
     pub attachments: Vec<Attachments>,
