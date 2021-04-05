@@ -1,17 +1,20 @@
+use crate::model::Error;
 use serenity::async_trait;
 use serenity::client::ClientBuilder;
 use serenity::model::prelude::Message;
 use serenity::prelude::{Context, EventHandler};
 
-pub async fn init() {
-    let mut client =
-        ClientBuilder::new(std::env::var("DISCORD_TOKEN").expect("Error: token not found!"))
-            .guild_subscriptions(true)
-            .event_handler(EventPoster)
-            .await
-            .unwrap();
+pub async fn init(token: impl AsRef<str>) -> Result<(), Error> {
+    let mut client = ClientBuilder::new(token)
+        .guild_subscriptions(true)
+        .event_handler(EventPoster)
+        .await
+        .unwrap();
 
-    client.start().await.unwrap()
+    match client.start().await {
+        Ok(_) => Ok(()),
+        Err(err) => Err(Error::Serenity(err)),
+    }
 }
 
 struct EventPoster;
