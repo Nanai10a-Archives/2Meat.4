@@ -23,7 +23,7 @@ struct EventPoster;
 impl EventHandler for EventPoster {
     async fn message(&self, ctx: Context, message: Message) {
         if message.content == "!ping" {
-            message.channel_id.say(ctx.http, "pong!").await;
+            message.channel_id.say(ctx.http, "pong!").await.unwrap();
         }
     }
 }
