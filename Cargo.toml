@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 threadpool = "*"
+serde = { version = "*", features = ["derive"] }
 serde_json = "*"
 mongodb = "*"
 tokio = { version = "0.2.*", features = ["macros"] }
