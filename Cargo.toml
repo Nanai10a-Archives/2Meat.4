@@ -17,7 +17,7 @@ chrono = "*"
 uuid = "*"
 
 [dependencies.serenity]
-version = "0.9.*"
+version = "*"
 default-features = false
 features = [
     "client",
@@ -26,4 +26,5 @@ features = [
     "model",
 #    "framework",
 #    "standard_framework"
+    "unstable_discord_api"
 ]
