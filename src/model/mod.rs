@@ -47,8 +47,3 @@ pub enum Place {
     Unknown,
     // TODO: Frontendが増える度に更新
 }
-
-#[derive(Debug)]
-pub enum Error {
-    Serenity(serenity::Error),
-}
