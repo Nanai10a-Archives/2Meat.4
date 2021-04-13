@@ -4,6 +4,8 @@ use serenity::client::ClientBuilder;
 use serenity::model::prelude::Message;
 use serenity::prelude::{Context, EventHandler};
 
+pub mod receivers;
+pub mod senders;
 pub mod transferer;
 
 pub async fn init(token: impl AsRef<str>) -> anyhow::Result<()> {
