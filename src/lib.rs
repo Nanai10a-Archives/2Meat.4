@@ -1,4 +1,5 @@
 #![feature(async_closure)]
+#![feature(exclusive_range_pattern)]
 pub mod commands;
 pub mod discord;
 pub mod interface;
