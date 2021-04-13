@@ -1,25 +1,23 @@
-pub trait New<T>: Sized {
-    fn new(parent: &T, place: Place) -> anyhow::Result<Self>;
-}
+use crate::model::arg::Place;
+use std::sync::Arc;
 
-pub enum Place {
-    There,
-    // TODO: FEATURE - Meta
+pub trait New<T> {
+    fn new(parent: impl AsRef<T>, place: Place) -> anyhow::Result<Box<Self>>;
 }
 
 #[deprecated]
-pub trait Mut: Sized {
-    fn mut_(self) -> anyhow::Result<Self>;
+pub trait Mut {
+    fn mut_(&self) -> anyhow::Result<()>;
 }
 
-pub trait Drop: Sized {
+pub trait Drop {
     fn drop(self) -> anyhow::Result<()>;
 }
 
-pub trait Subsc<T>: Sized {
-    fn subsc(self, target: &T) -> anyhow::Result<Self>;
+pub trait Subsc<T> {
+    fn subsc(&self, target: impl AsRef<T>) -> anyhow::Result<()>;
 }
 
-pub trait Exit<T>: Sized {
-    fn exit(self, target: &T) -> anyhow::Result<Self>;
+pub trait Exit<T> {
+    fn exit(&self, target: impl AsRef<T>) -> anyhow::Result<()>;
 }
