@@ -4,7 +4,9 @@ use serenity::client::ClientBuilder;
 use serenity::model::prelude::Message;
 use serenity::prelude::{Context, EventHandler};
 
-pub async fn init(token: impl AsRef<str>) -> Result<(), Error> {
+pub mod transferer;
+
+pub async fn init(token: impl AsRef<str>) -> anyhow::Result<()> {
     let mut client = ClientBuilder::new(token)
         .guild_subscriptions(true)
         .event_handler(EventPoster)
