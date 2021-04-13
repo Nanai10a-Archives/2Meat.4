@@ -32,7 +32,10 @@ impl DiscordReceivers {
         let vec = self
             .receivers
             .iter()
-            .filter(|item| item.id == id)
+            .filter(|item| match ***item {
+                None => false,
+                Some(_) => (***item).unwrap().id == id,
+            })
             .collect::<Vec<_>>();
         match vec.len() {
             0..1 => (),
