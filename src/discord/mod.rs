@@ -1,8 +1,9 @@
 use serenity::client::ClientBuilder;
-use serenity::model::prelude::Message;
-use serenity::prelude::{Context, EventHandler};
+
+use interface::DiscordInterface;
 
 mod impl_commands;
+pub mod interface;
 pub mod receivers;
 pub mod senders;
 pub mod transferer;
