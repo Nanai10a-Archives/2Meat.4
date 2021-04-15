@@ -45,9 +45,10 @@ impl DiscordReceivers {
             Some(arc) => (**arc).clone(),
         };
 
-        match *(*arc).lock().unwrap() {
+        let res = match *(*arc).lock().unwrap() {
             None => Err(anyhow::Error::msg("not found (was deleted).")),
-            Some(_) => Ok(arc),
-        }
+            Some(_) => Ok(arc.clone()),
+        };
+        res
     }
 }
