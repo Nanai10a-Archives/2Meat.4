@@ -1,7 +1,5 @@
 use serenity::client::ClientBuilder;
 
-use interface::DiscordInterface;
-
 mod impl_commands;
 pub mod interface;
 pub mod receivers;

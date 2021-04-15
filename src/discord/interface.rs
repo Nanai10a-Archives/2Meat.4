@@ -1,6 +1,5 @@
 use serenity::builder::{
-    CreateInteraction, CreateInteractionOption, CreateInteractionResponse,
-    CreateInteractionResponseData,
+    CreateInteraction, CreateInteractionResponse, CreateInteractionResponseData,
 };
 use serenity::http::Http;
 use serenity::model::prelude::{
@@ -16,9 +15,8 @@ use crate::interface::Interface;
 use crate::model::arg::{CommandArgs, Target};
 use crate::model::data::{Author, FormattedData, Place};
 use crate::utils::RefWrap;
-use anyhow::Error;
 use clap::clap_app;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 pub struct DiscordInterface {
     data_sender: broadcast::Sender<FormattedData>,
@@ -112,7 +110,7 @@ impl DiscordInterface {
                 sender_id,
             } => {
                 match self.receivers.get(receiver_id) {
-                    Ok(mut recv) => match self.senders.get(sender_id) {
+                    Ok(recv) => match self.senders.get(sender_id) {
                         Ok(send) => {
                             crate::commands::Subsc::subsc(
                                 recv.lock().unwrap().as_mut().unwrap(),
@@ -131,7 +129,7 @@ impl DiscordInterface {
                 sender_id,
             } => {
                 match self.receivers.get(receiver_id) {
-                    Ok(mut recv) => match self.senders.get(sender_id) {
+                    Ok(recv) => match self.senders.get(sender_id) {
                         Ok(send) => {
                             crate::commands::Exit::exit(
                                 recv.lock().unwrap().as_mut().unwrap(),
