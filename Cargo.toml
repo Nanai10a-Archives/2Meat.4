@@ -7,18 +7,18 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-threadpool = "*"
-serde = { version = "*", features = ["derive"] }
-serde_json = "*"
-mongodb = "*"
-tokio = { version = "*", features = ["full"] }
-dotenv = "*"
-chrono = "*"
-uuid = "*"
-anyhow = "*"
+threadpool = ">=1.8.1"
+serde = { version = ">=1.0.125", features = ["derive"] }
+serde_json = ">=1.0.64"
+mongodb = ">=2.0.0-alpha.1"
+tokio = { version = ">=1.5.0", features = ["full"] }
+dotenv = ">=0.15.0"
+chrono = ">=0.4.19"
+uuid = ">=0.8.2"
+anyhow = ">=1.0.40"
 
 [dependencies.serenity]
-version = "*"
+version = ">=0.10.5"
 default-features = false
 features = [
     "client",
