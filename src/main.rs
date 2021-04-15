@@ -17,7 +17,7 @@ fn main() {
                             None => break i,
                             Some(_) => (),
                         };
-                        i = i + 1;
+                        i += 1;
                     }
                 };
 
