@@ -33,7 +33,7 @@ impl DiscordSenders {
         let vec = self
             .senders
             .iter()
-            .filter(|item| (***item).lock().unwrap().unwrap().id == id)
+            .filter(|item| (***item).lock().unwrap().as_ref().unwrap().id == id)
             .collect::<Vec<_>>();
         match vec.len() {
             0..1 => (),
