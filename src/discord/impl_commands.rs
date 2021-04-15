@@ -5,7 +5,7 @@ use crate::model::arg::Place;
 use crate::utils::RefWrap;
 
 impl commands::New<DiscordSenders> for DiscordSender {
-    fn new(_parent: impl AsRef<DiscordSenders>, _place: Place) -> anyhow::Result<RefWrap<Self>> {
+    fn new(_parent: &DiscordSenders, _place: Place) -> anyhow::Result<RefWrap<Self>> {
         todo!()
     }
 }
@@ -17,7 +17,7 @@ impl commands::Drop for DiscordSender {
 }
 
 impl commands::New<DiscordReceivers> for DiscordReceiver {
-    fn new(_parent: impl AsRef<DiscordReceivers>, _place: Place) -> anyhow::Result<RefWrap<Self>> {
+    fn new(_parent: &DiscordReceivers, _place: Place) -> anyhow::Result<RefWrap<Self>> {
         todo!()
     }
 }
@@ -29,13 +29,13 @@ impl commands::Drop for DiscordReceiver {
 }
 
 impl commands::Subsc<DiscordSender> for DiscordReceiver {
-    fn subsc(&mut self, _target: impl AsRef<DiscordSender>) -> anyhow::Result<()> {
+    fn subsc(&mut self, _target: &DiscordSender) -> anyhow::Result<()> {
         todo!()
     }
 }
 
 impl commands::Exit<DiscordSender> for DiscordReceiver {
-    fn exit(&mut self, _target: impl AsRef<DiscordSender>) -> anyhow::Result<()> {
+    fn exit(&mut self, _target: &DiscordSender) -> anyhow::Result<()> {
         todo!()
     }
 }
