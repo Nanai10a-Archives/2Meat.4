@@ -2,7 +2,7 @@ use crate::model::arg::Place;
 use crate::utils::RefWrap;
 
 pub trait New<T>: Sized {
-    fn new(parent: impl AsRef<T>, place: Place) -> anyhow::Result<RefWrap<Self>>;
+    fn new(parent: &T, place: Place) -> anyhow::Result<RefWrap<Self>>;
 }
 
 #[deprecated]
@@ -15,9 +15,9 @@ pub trait Drop: Sized {
 }
 
 pub trait Subsc<T> {
-    fn subsc(&mut self, target: impl AsRef<T>) -> anyhow::Result<()>;
+    fn subsc(&mut self, target: &T) -> anyhow::Result<()>;
 }
 
 pub trait Exit<T> {
-    fn exit(&mut self, target: impl AsRef<T>) -> anyhow::Result<()>;
+    fn exit(&mut self, target: &T) -> anyhow::Result<()>;
 }
