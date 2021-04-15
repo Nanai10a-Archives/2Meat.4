@@ -1,23 +1,23 @@
 use crate::model::arg::Place;
-use std::sync::Arc;
+use crate::utils::RefWrap;
 
-pub trait New<T> {
-    fn new(parent: impl AsRef<T>, place: Place) -> anyhow::Result<Box<Self>>;
+pub trait New<T>: Sized {
+    fn new(parent: impl AsRef<T>, place: Place) -> anyhow::Result<RefWrap<Self>>;
 }
 
 #[deprecated]
 pub trait Mut {
-    fn mut_(&self) -> anyhow::Result<()>;
+    fn mut_(&mut self) -> anyhow::Result<()>;
 }
 
-pub trait Drop {
-    fn drop(self) -> anyhow::Result<()>;
+pub trait Drop: Sized {
+    fn drop(self_: RefWrap<Self>) -> anyhow::Result<()>;
 }
 
 pub trait Subsc<T> {
-    fn subsc(&self, target: impl AsRef<T>) -> anyhow::Result<()>;
+    fn subsc(&mut self, target: impl AsRef<T>) -> anyhow::Result<()>;
 }
 
 pub trait Exit<T> {
-    fn exit(&self, target: impl AsRef<T>) -> anyhow::Result<()>;
+    fn exit(&mut self, target: impl AsRef<T>) -> anyhow::Result<()>;
 }
