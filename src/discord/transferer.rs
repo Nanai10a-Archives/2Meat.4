@@ -12,10 +12,7 @@ impl Transferer {
     }
 
     pub fn contains(&self, id: Uuid) -> bool {
-        match self.which_is(id) {
-            Ok(_) => true,
-            Err(_) => false,
-        }
+        self.which_is(id).is_ok()
     }
 
     pub fn which_is(&self, id: Uuid) -> anyhow::Result<Target> {
