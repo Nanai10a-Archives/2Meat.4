@@ -3,6 +3,7 @@ use std::sync::Arc;
 use uuid::Uuid;
 
 use crate::discord::transferer::Transferer;
+use crate::utils::RefWrap;
 
 pub struct DiscordReceiver {
     id: Uuid,
@@ -16,7 +17,7 @@ impl DiscordReceiver {
 }
 
 pub struct DiscordReceivers {
-    receivers: Vec<Arc<Option<DiscordReceiver>>>,
+    receivers: Vec<RefWrap<DiscordReceiver>>,
     transferer: Arc<Transferer>,
 }
 
@@ -28,14 +29,11 @@ impl DiscordReceivers {
         }
     }
 
-    pub fn get(&self, id: Uuid) -> anyhow::Result<Arc<Option<DiscordReceiver>>> {
+    pub fn get(&self, id: Uuid) -> anyhow::Result<RefWrap<DiscordReceiver>> {
         let vec = self
             .receivers
             .iter()
-            .filter(|item| match ***item {
-                None => false,
-                Some(_) => (***item).unwrap().id == id,
-            })
+            .filter(|item| (***item).lock().unwrap().unwrap().id == id)
             .collect::<Vec<_>>();
         match vec.len() {
             0..1 => (),
@@ -47,7 +45,7 @@ impl DiscordReceivers {
             Some(arc) => (**arc).clone(),
         };
 
-        match *arc {
+        match *(*arc).lock().unwrap() {
             None => Err(anyhow::Error::msg("not found (was deleted).")),
             Some(_) => Ok(arc),
         }
