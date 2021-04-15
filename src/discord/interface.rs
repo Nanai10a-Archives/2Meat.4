@@ -8,6 +8,7 @@ use serenity::model::prelude::{
 use serenity::prelude::{Context, EventHandler};
 use tokio::sync::broadcast;
 
+use crate::commands;
 use crate::discord::receivers::{DiscordReceiver, DiscordReceivers};
 use crate::discord::senders::{DiscordSender, DiscordSenders};
 use crate::discord::transferer::Transferer;
@@ -83,23 +84,23 @@ impl DiscordInterface {
             CommandArgs::New { target, place } => match target {
                 Target::Receiver => {
                     let rs: anyhow::Result<RefWrap<DiscordReceiver>> =
-                        crate::commands::New::new(self.receivers.as_ref(), place);
+                        commands::New::new(self.receivers.as_ref(), place);
                     todo!()
                 }
                 Target::Sender => {
                     let rs: anyhow::Result<RefWrap<DiscordSender>> =
-                        crate::commands::New::<DiscordSenders>::new(self.senders.as_ref(), place);
+                        commands::New::<DiscordSenders>::new(self.senders.as_ref(), place);
                     todo!()
                 }
             },
             CommandArgs::Drop { id } => {
                 match self.transferer.which_is(id).unwrap() {
                     Target::Receiver => match self.receivers.get(id) {
-                        Ok(item) => crate::commands::Drop::drop(item),
+                        Ok(item) => commands::Drop::drop(item),
                         Err(_) => todo!(),
                     },
                     Target::Sender => match self.senders.get(id) {
-                        Ok(item) => crate::commands::Drop::drop(item),
+                        Ok(item) => commands::Drop::drop(item),
                         Err(_) => todo!(),
                     },
                 };
@@ -112,7 +113,7 @@ impl DiscordInterface {
                 match self.receivers.get(receiver_id) {
                     Ok(recv) => match self.senders.get(sender_id) {
                         Ok(send) => {
-                            crate::commands::Subsc::subsc(
+                            commands::Subsc::subsc(
                                 recv.lock().unwrap().as_mut().unwrap(),
                                 send.lock().unwrap().as_ref().unwrap(),
                             );
@@ -131,7 +132,7 @@ impl DiscordInterface {
                 match self.receivers.get(receiver_id) {
                     Ok(recv) => match self.senders.get(sender_id) {
                         Ok(send) => {
-                            crate::commands::Exit::exit(
+                            commands::Exit::exit(
                                 recv.lock().unwrap().as_mut().unwrap(),
                                 send.lock().unwrap().as_ref().unwrap(),
                             );
