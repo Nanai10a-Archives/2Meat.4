@@ -13,7 +13,7 @@ pub struct FormattedData {
 }
 
 impl Display for FormattedData {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
         String::new().write_fmt(format_args!(
             "{}\
             \
@@ -49,7 +49,7 @@ pub struct Author {
 }
 
 impl Display for Author {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
         match &self.nickname {
             None => String::new().write_fmt(format_args!(
                 "{}: {} on {:?}",
