@@ -282,6 +282,60 @@ impl DiscordInterface {
     }
 }
 
+// TODO: Test
+pub async fn split_raw_command(content: impl Into<String>) -> Vec<String> {
+    let mut content = content.into();
+    if content.is_empty() {
+        todo!()
+    }
+
+    let mut vec = vec![];
+    let mut tmp_str = "".to_string();
+
+    let mut reaming_raw_1 = false;
+    let mut reaming_raw_2 = false;
+    let mut next_raw = false;
+
+    let reg = regex::Regex::new(r"\s").unwrap();
+
+    for _ in 0..(content.len() - 1) {
+        let ch = content.remove(0);
+
+        // エスケープ処理
+        if next_raw {
+            tmp_str.push(ch);
+            next_raw = false;
+            continue;
+        }
+
+        // 引用符/二重引用符で囲まれているときの処理
+        if reaming_raw_2 || reaming_raw_1 {
+            tmp_str.push(ch);
+            continue;
+        }
+
+        // 空白文字のときの処理
+        if reg.is_match(format!("{}", ch).as_str()) {
+            if !tmp_str.is_empty() {
+                vec.push(tmp_str.drain(..tmp_str.len()).collect::<String>())
+            }
+
+            continue;
+        }
+
+        match ch {
+            '\\' => next_raw = true,
+            '"' => reaming_raw_2 = !reaming_raw_2,
+            '\'' => reaming_raw_1 = !reaming_raw_1,
+            _ => tmp_str.push(ch),
+        };
+    }
+
+    vec.push(tmp_str);
+
+    vec
+}
+
 pub enum PostTo {
     Global,
     Guild(GuildId),
