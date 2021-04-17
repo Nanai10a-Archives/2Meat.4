@@ -27,6 +27,7 @@ pub struct DiscordInterface {
     senders: Arc<DiscordSenders>,
     receivers: Arc<DiscordReceivers>,
     transferer: Arc<Transferer>,
+    command_parser: clap::App<'static>,
     waiter_is_spawned: bool,
 }
 
