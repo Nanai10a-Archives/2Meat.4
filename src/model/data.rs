@@ -65,13 +65,12 @@ impl Display for Author {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AdditionalContent {
-    DiscordPlaceInfo,
     // TODO: なんか情報を付け足したい場合はここで 依存がおかしくならない程度に
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Place {
-    Discord,
+    Discord { channel_id: u64 },
     Twitter,
     Mastodon,
     Unknown,
