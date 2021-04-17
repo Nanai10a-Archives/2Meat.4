@@ -3,7 +3,8 @@ use serenity::builder::{
 };
 use serenity::http::Http;
 use serenity::model::prelude::{
-    ApplicationCommand, ApplicationCommandOptionType, GuildId, Interaction, Message, MessageType,
+    ApplicationCommand, ApplicationCommandOptionType, ChannelId, GuildId, Interaction, Message,
+    MessageType,
 };
 use serenity::prelude::{Context, EventHandler};
 use tokio::sync::broadcast;
@@ -17,6 +18,7 @@ use crate::model::arg::{CommandArgs, Target};
 use crate::model::data::{Author, FormattedData, Place};
 use crate::utils::RefWrap;
 use clap::clap_app;
+use std::fmt::Display;
 use std::sync::Arc;
 
 pub struct DiscordInterface {
@@ -171,8 +173,14 @@ impl DiscordInterface {
         todo!()
     }
 
-    pub fn on_send(&self, _data: FormattedData) -> anyhow::Result<()> {
-        todo!()
+    pub async fn on_send(
+        &self,
+        channel_id: ChannelId,
+        http: impl AsRef<Http>,
+        content: impl Display,
+    ) -> anyhow::Result<()> {
+        channel_id.say(http, content).await.unwrap();
+        Ok(())
     }
 
     fn create_interaction(ci: &mut CreateInteraction) -> &mut CreateInteraction {
