@@ -27,9 +27,35 @@ pub struct DiscordInterface {
     senders: Arc<DiscordSenders>,
     receivers: Arc<DiscordReceivers>,
     transferer: Arc<Transferer>,
+    waiter_is_spawned: bool,
 }
 
 impl DiscordInterface {
+    #[inline]
+    pub async fn spawn_recv_waiter(self) -> anyhow::Result<Self> {
+        if self.waiter_is_spawned {
+            return Err(anyhow::Error::msg(
+                "waiter is already spawned (spawn blocked).",
+            ));
+        }
+        self.spawn_recv_waiter_inner().await
+    }
+
+    #[inline]
+    pub async fn spawn_recv_waiter_force(self) -> anyhow::Result<Self> {
+        self.spawn_recv_waiter().await
+    }
+
+    #[inline]
+    fn spawn_recv_waiter_inner(mut self) -> anyhow::Result<Self> {
+        tokio::task::spawn_blocking(async || loop {
+            let data = self.data_receiver.recv().await.unwrap();
+            tokio::task::spawn(async { self.send(data).await });
+        });
+
+        Ok(self)
+    }
+
     async fn post_slash_command<F>(
         &self,
         post_to: PostTo,
