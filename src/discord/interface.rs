@@ -81,8 +81,21 @@ impl DiscordInterface {
         }
     }
 
-    pub fn is_command(&self, _msg: &Message) -> anyhow::Result<bool> {
-        todo!()
+    pub fn msg_is_command(&self, msg: &Message) -> anyhow::Result<bool> {
+        if msg.author.bot {
+            return Ok(false);
+        }
+
+        let res = self
+            .command_parser
+            .try_get_matches_from(split_raw_command(msg.content.clone()))
+            .is_ok();
+        Ok(res)
+    }
+
+    pub fn is_ia_command(&self, ia: &Interaction) -> anyhow::Result<bool> {
+        // FIXME: このMember.user.botはAuthorを指しているのか?
+        Ok(!ia.member.user.bot)
     }
 
     pub async fn on_msg_command(&self, ctx: Context, msg: Message) -> anyhow::Result<Message> {
@@ -394,7 +407,7 @@ impl EventHandler for DiscordInterface {
             return;
         }
 
-        if self.is_command(&msg).unwrap() {
+        if self.msg_is_command(&msg).unwrap() {
             self.on_msg_command(ctx, msg).await.unwrap();
             return;
         }
@@ -409,6 +422,8 @@ impl EventHandler for DiscordInterface {
     }
 
     async fn interaction_create(&self, ctx: Context, ia: Interaction) {
-        self.on_ia_command(ctx, ia).await.unwrap();
+        if self.is_ia_command(&ia).unwrap() {
+            self.on_ia_command(ctx, ia).await.unwrap();
+        }
     }
 }
