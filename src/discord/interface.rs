@@ -390,12 +390,33 @@ pub enum PostTo {
     Guild(GuildId),
 }
 
+#[serenity::async_trait]
 impl Interface for DiscordInterface {
-    fn receive(&self, _data: FormattedData) -> anyhow::Result<()> {
-        todo!()
+    // 受け
+    async fn receive(&self, data: FormattedData) -> anyhow::Result<()> {
+        self.data_sender.send(data).unwrap();
+        Ok(())
     }
 
-    fn send(&self, _data: FormattedData) -> anyhow::Result<()> {
+    // 攻め
+    async fn send(&self, data: FormattedData) -> anyhow::Result<()> {
+        let rid = data.author.place;
+
+        if let Place::Discord { channel_id } = rid {
+            ChannelId(channel_id)
+                .say(
+                    self.serenity_ctx.as_ref().lock().unwrap().as_ref().unwrap(),
+                    format!(
+                        "```\
+{}\
+```\
+",
+                        data
+                    ),
+                )
+                .await;
+            return Ok(());
+        }
         todo!()
     }
 }
