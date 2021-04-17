@@ -200,7 +200,9 @@ impl DiscordInterface {
                 name: msg.author.name.as_str().into(),
                 nickname: msg.author_nick(ctx.http).await,
                 id: msg.author.id.0.to_string(),
-                place: Place::Discord,
+                place: Place::Discord {
+                    channel_id: msg.channel_id.0,
+                },
             },
             additional_contents: None,
             timestamp: msg.timestamp,
