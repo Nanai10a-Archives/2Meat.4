@@ -4,7 +4,7 @@ use serenity::builder::{
 use serenity::http::Http;
 use serenity::model::prelude::{
     ApplicationCommand, ApplicationCommandOptionType, ChannelId, GuildId, Interaction, Message,
-    MessageType,
+    MessageType, Ready,
 };
 use serenity::prelude::{Context, EventHandler};
 use tokio::sync::broadcast;
@@ -28,6 +28,7 @@ pub struct DiscordInterface {
     receivers: Arc<DiscordReceivers>,
     transferer: Arc<Transferer>,
     command_parser: clap::App<'static>,
+    serenity_ctx: RefWrap<Context>,
     waiter_is_spawned: bool,
 }
 
@@ -399,6 +400,12 @@ impl EventHandler for DiscordInterface {
         }
 
         self.on_receive(ctx, msg).await.unwrap()
+    }
+
+    async fn ready(&self, ctx: Context, ready: Ready) {
+        let mut self_ctx: RefWrap<Context> = self.serenity_ctx.clone();
+        *self_ctx.get_mut().unwrap() = Some(ctx);
+        println!("{:?}", ready);
     }
 
     async fn interaction_create(&self, ctx: Context, ia: Interaction) {
