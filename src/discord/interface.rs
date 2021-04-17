@@ -7,7 +7,7 @@ use serenity::model::prelude::{
     MessageType, Ready,
 };
 use serenity::prelude::{Context, EventHandler};
-use tokio::sync::broadcast;
+use tokio::sync::{broadcast, Mutex};
 
 use crate::commands;
 use crate::discord::receivers::{DiscordReceiver, DiscordReceivers};
@@ -34,28 +34,30 @@ pub struct DiscordInterface {
 
 impl DiscordInterface {
     #[inline]
-    pub async fn spawn_recv_waiter(self) -> anyhow::Result<Self> {
-        if self.waiter_is_spawned {
+    pub async fn spawn_recv_waiter(self_: Arc<Mutex<Self>>) -> anyhow::Result<()> {
+        if self_.lock().await.waiter_is_spawned {
             return Err(anyhow::Error::msg(
                 "waiter is already spawned (spawn blocked).",
             ));
         }
-        self.spawn_recv_waiter_inner().await
+
+        Self::spawn_recv_waiter_inner(self_).await
     }
 
     #[inline]
-    pub async fn spawn_recv_waiter_force(self) -> anyhow::Result<Self> {
-        self.spawn_recv_waiter().await
+    pub async fn spawn_recv_waiter_force(self_: Arc<Mutex<Self>>) -> anyhow::Result<()> {
+        Self::spawn_recv_waiter_inner(self_).await
     }
 
     #[inline]
-    fn spawn_recv_waiter_inner(mut self) -> anyhow::Result<Self> {
-        tokio::task::spawn_blocking(async || loop {
-            let data = self.data_receiver.recv().await.unwrap();
-            tokio::task::spawn(async { self.send(data).await });
+    async fn spawn_recv_waiter_inner(self_: Arc<Mutex<Self>>) -> anyhow::Result<()> {
+        tokio::task::spawn_blocking(async move || loop {
+            let data = self_.lock().await.data_receiver.recv().await.unwrap();
+            let self_ = self_.clone();
+            tokio::task::spawn(async move { self_.lock().await.send(data).await });
         });
 
-        Ok(self)
+        Ok(())
     }
 
     async fn post_slash_command<F>(
