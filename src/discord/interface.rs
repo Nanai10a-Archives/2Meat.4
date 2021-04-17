@@ -193,7 +193,7 @@ impl DiscordInterface {
     }
 
     pub async fn on_receive(&self, ctx: Context, msg: Message) -> anyhow::Result<()> {
-        self.on_receive_process(FormattedData {
+        self.receive(FormattedData {
             content: msg.content.as_str().into(),
             attachments: vec![],
             author: Author {
@@ -205,13 +205,7 @@ impl DiscordInterface {
             additional_contents: None,
             timestamp: msg.timestamp,
         })
-    }
-
-    fn on_receive_process(&self, _data: FormattedData) -> anyhow::Result<()> {
-        // Transfererにdataを投げて,
-        // callbackではなくsenderにhttpとかの情報を持たせて
-        // on_send(...)してほしい
-        todo!()
+        .await
     }
 
     pub async fn on_send(
