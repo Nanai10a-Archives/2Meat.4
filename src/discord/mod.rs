@@ -4,6 +4,7 @@ mod impl_commands;
 pub mod interface;
 pub mod receivers;
 pub mod senders;
+pub mod transceiver;
 pub mod transferer;
 
 pub async fn init(token: impl AsRef<str>) -> anyhow::Result<()> {
