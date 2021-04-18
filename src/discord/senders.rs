@@ -10,11 +10,7 @@ pub struct DiscordSender {
     parent: Arc<DiscordSenders>,
 }
 
-impl DiscordSender {
-    pub fn id(&self) -> Uuid {
-        self.id
-    }
-}
+impl DiscordSender {}
 
 pub struct DiscordSenders {
     senders: Vec<RefWrap<DiscordSender>>,
