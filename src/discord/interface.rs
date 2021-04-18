@@ -83,7 +83,7 @@ impl DiscordInterface {
         }
     }
 
-    pub fn msg_is_command(&self, msg: &Message) -> anyhow::Result<bool> {
+    pub async fn msg_is_command(&self, msg: &Message) -> anyhow::Result<bool> {
         if msg.author.bot {
             return Ok(false);
         }
@@ -91,7 +91,7 @@ impl DiscordInterface {
         let res = self
             .command_parser
             .clone()
-            .try_get_matches_from(split_raw_command(msg.content.clone()))
+            .try_get_matches_from(split_raw_command(msg.content.clone()).await)
             .is_ok();
         Ok(res)
     }
