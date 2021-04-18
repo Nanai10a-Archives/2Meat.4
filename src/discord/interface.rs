@@ -216,10 +216,22 @@ impl DiscordInterface {
     pub async fn on_send(
         &self,
         channel_id: ChannelId,
-        http: impl AsRef<Http>,
         content: impl Display,
     ) -> anyhow::Result<()> {
-        channel_id.say(http, content).await.unwrap();
+        channel_id
+            .say(
+                (*self.serenity_ctx.clone())
+                    .lock()
+                    .await
+                    .as_ref()
+                    .unwrap()
+                    .http
+                    .clone(),
+                content,
+            )
+            .await
+            .unwrap();
+
         Ok(())
     }
 
