@@ -28,37 +28,9 @@ pub struct DiscordInterface {
     transferer: Arc<Transferer>,
     command_parser: clap::App<'static>,
     serenity_ctx: RefWrap<Context>,
-    waiter_is_spawned: bool,
 }
 
 impl DiscordInterface {
-    #[inline]
-    pub async fn spawn_recv_waiter(self_: Arc<Mutex<Self>>) -> anyhow::Result<()> {
-        if self_.lock().await.waiter_is_spawned {
-            return Err(anyhow::Error::msg(
-                "waiter is already spawned (spawn blocked).",
-            ));
-        }
-
-        Self::spawn_recv_waiter_inner(self_).await
-    }
-
-    #[inline]
-    pub async fn spawn_recv_waiter_force(self_: Arc<Mutex<Self>>) -> anyhow::Result<()> {
-        Self::spawn_recv_waiter_inner(self_).await
-    }
-
-    #[inline]
-    async fn spawn_recv_waiter_inner(self_: Arc<Mutex<Self>>) -> anyhow::Result<()> {
-        tokio::task::spawn_blocking(async move || loop {
-            let data = self_.lock().await.data_receiver.recv().await.unwrap();
-            let self_ = self_.clone();
-            tokio::task::spawn(async move { self_.lock().await.send(data).await });
-        });
-
-        Ok(())
-    }
-
     async fn post_slash_command<F>(
         &self,
         post_to: PostTo,
