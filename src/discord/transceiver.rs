@@ -2,6 +2,8 @@ use std::sync::Arc;
 
 use uuid::Uuid;
 
+use tokio::sync::{mpsc, Mutex};
+
 use crate::discord::transferer::Transferer;
 use crate::utils::RefWrap;
 
@@ -19,13 +21,21 @@ pub trait Transceiver {
 }
 
 pub struct DiscordTransceivers {
-    children: Vec<RefWrap<DiscordTransceiver>>,
+    children: Vec<(
+        RefWrap<DiscordTransceiver>,
+        Mutex<(mpsc::Sender<Signal>, mpsc::Receiver<Signal>)>,
+    )>,
     transferer: Arc<Transferer>,
+}
+
+pub enum Signal {
+    Drop(Uuid),
+    Success(Uuid),
 }
 
 pub struct DiscordTransceiver {
     id: Uuid,
-    parent: Arc<DiscordTransceivers>,
+    to_parent: Mutex<(mpsc::Sender<Signal>, mpsc::Receiver<Signal>)>,
 }
 
 #[serenity::async_trait]
@@ -42,8 +52,8 @@ impl Transceivers for DiscordTransceivers {
     async fn get_child(&self, id: Uuid) -> anyhow::Result<RefWrap<Self::Child>> {
         let mut vec = vec![];
         for send in self.children.iter() {
-            if (**send).lock().await.as_ref().unwrap().id == id {
-                vec.push(send);
+            if (*(*send).0).lock().await.as_ref().unwrap().id == id {
+                vec.push((*send).0.clone());
             }
         }
 
