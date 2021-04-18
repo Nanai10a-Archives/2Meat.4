@@ -11,13 +11,39 @@ use crate::utils::RefWrap;
 pub trait Transceivers {
     type Child: Transceiver;
 
+    fn get_children(&self) -> Vec<RefWrap<Self::Child>>;
+
     async fn new(transferer: Arc<Transferer>) -> Self;
     async fn get_child(&self, id: Uuid) -> anyhow::Result<RefWrap<Self::Child>>;
+    async fn new_child(&mut self) -> anyhow::Result<RefWrap<Self::Child>>;
+
+    async fn new_id(&self) -> Uuid {
+        let id = loop {
+            let id = Uuid::new_v4();
+
+            for child_ref in self.get_children().iter() {
+                match child_ref.lock().await.as_ref() {
+                    None => (),
+                    Some(child) => {
+                        if child.get_id() == id {
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            break id;
+        };
+
+        id
+    }
 }
 
 #[serenity::async_trait]
 pub trait Transceiver {
     type Parent: Transceivers;
+
+    fn get_id(&self) -> Uuid;
 }
 
 pub struct DiscordTransceivers {
@@ -41,6 +67,13 @@ pub struct DiscordTransceiver {
 #[serenity::async_trait]
 impl Transceivers for DiscordTransceivers {
     type Child = DiscordTransceiver;
+
+    fn get_children(&self) -> Vec<RefWrap<Self::Child>> {
+        self.children
+            .iter()
+            .map(|item| (*item).0.clone())
+            .collect::<Vec<_>>()
+    }
 
     async fn new(transferer: Arc<Transferer>) -> Self {
         DiscordTransceivers {
@@ -73,9 +106,30 @@ impl Transceivers for DiscordTransceivers {
         };
         res
     }
+
+    async fn new_child(&mut self) -> anyhow::Result<RefWrap<Self::Child>> {
+        let id = self.new_id().await;
+        let (send1, recv1) = mpsc::channel(8);
+        let (send2, recv2) = mpsc::channel(8);
+
+        let child: RefWrap<Self::Child> = Arc::new(Mutex::new(Some(Self::Child {
+            id,
+            to_parent: Mutex::new((send1, recv2)),
+        })));
+
+        let to_child = Mutex::new((send2, recv1));
+
+        self.children.push((child.clone(), to_child));
+
+        Ok(child)
+    }
 }
 
 #[serenity::async_trait]
 impl Transceiver for DiscordTransceiver {
     type Parent = DiscordTransceivers;
+
+    fn get_id(&self) -> Uuid {
+        self.id
+    }
 }
