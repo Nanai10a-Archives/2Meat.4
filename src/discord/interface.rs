@@ -159,8 +159,8 @@ impl DiscordInterface {
                     Ok(recv) => match self.senders.get(sender_id).await {
                         Ok(send) => {
                             commands::Subsc::subsc(
-                                recv.lock().unwrap().as_mut().unwrap(),
-                                send.lock().unwrap().as_ref().unwrap(),
+                                recv.lock().await.as_mut().unwrap(),
+                                send.lock().await.as_ref().unwrap(),
                             );
                             todo!()
                         }
@@ -178,8 +178,8 @@ impl DiscordInterface {
                     Ok(recv) => match self.senders.get(sender_id).await {
                         Ok(send) => {
                             commands::Exit::exit(
-                                recv.lock().unwrap().as_mut().unwrap(),
-                                send.lock().unwrap().as_ref().unwrap(),
+                                recv.lock().await.as_mut().unwrap(),
+                                send.lock().await.as_ref().unwrap(),
                             );
                             todo!()
                         }
@@ -403,7 +403,7 @@ impl Interface for DiscordInterface {
         if let Place::Discord { channel_id } = rid {
             ChannelId(channel_id)
                 .say(
-                    self.serenity_ctx.as_ref().lock().unwrap().as_ref().unwrap(),
+                    self.serenity_ctx.as_ref().lock().await.as_ref().unwrap(),
                     format!(
                         "```\
 {}\
@@ -426,7 +426,7 @@ impl EventHandler for DiscordInterface {
             return;
         }
 
-        if self.msg_is_command(&msg).unwrap() {
+        if self.msg_is_command(&msg).await.unwrap() {
             self.on_msg_command(ctx, msg).await.unwrap();
             return;
         }
@@ -435,8 +435,7 @@ impl EventHandler for DiscordInterface {
     }
 
     async fn ready(&self, ctx: Context, ready: Ready) {
-        let mut self_ctx: RefWrap<Context> = self.serenity_ctx.clone();
-        *self_ctx.get_mut().unwrap() = Some(ctx);
+        *self.serenity_ctx.lock().await = Some(ctx);
         println!("{:?}", ready);
     }
 
