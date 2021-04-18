@@ -32,7 +32,7 @@ pub struct Attachments {
     pub binary: Option<Vec<u8>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum AttachmentType {
     Image,
     Audio,
@@ -63,12 +63,12 @@ impl Display for Author {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum AdditionalContent {
     // TODO: なんか情報を付け足したい場合はここで 依存がおかしくならない程度に
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum Place {
     Discord { channel_id: u64 },
     Twitter,
