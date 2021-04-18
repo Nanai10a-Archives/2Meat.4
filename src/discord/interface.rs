@@ -413,9 +413,7 @@ impl Interface for DiscordInterface {
 
     // 攻め
     async fn send(&self, data: FormattedData) -> anyhow::Result<()> {
-        let rid = data.author.place;
-
-        if let Place::Discord { channel_id } = rid {
+        if let Place::Discord { channel_id } = data.author.place {
             ChannelId(channel_id)
                 .say(
                     self.serenity_ctx.as_ref().lock().await.as_ref().unwrap(),
