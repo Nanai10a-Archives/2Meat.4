@@ -29,12 +29,14 @@ impl DiscordReceivers {
         }
     }
 
-    pub fn get(&self, id: Uuid) -> anyhow::Result<RefWrap<DiscordReceiver>> {
-        let vec = self
-            .receivers
-            .iter()
-            .filter(|item| (***item).lock().unwrap().as_ref().unwrap().id == id)
-            .collect::<Vec<_>>();
+    pub async fn get(&self, id: Uuid) -> anyhow::Result<RefWrap<DiscordReceiver>> {
+        let mut vec = vec![];
+        for send in self.receivers.iter() {
+            if (**send).lock().await.as_ref().unwrap().id == id {
+                vec.push(send);
+            }
+        }
+
         match vec.len() {
             0..1 => (),
             _ => todo!(),
@@ -42,10 +44,10 @@ impl DiscordReceivers {
 
         let arc = match vec.first() {
             None => return Err(anyhow::Error::msg("not found (was not registered).")),
-            Some(arc) => (**arc).clone(),
+            Some(arc) => (*arc).clone(),
         };
 
-        let res = match *(*arc).lock().unwrap() {
+        let res = match *(*arc).lock().await {
             None => Err(anyhow::Error::msg("not found (was deleted).")),
             Some(_) => Ok(arc.clone()),
         };

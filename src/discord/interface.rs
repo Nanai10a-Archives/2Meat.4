@@ -140,11 +140,11 @@ impl DiscordInterface {
             },
             CommandArgs::Drop { id } => {
                 match self.transferer.which_is(id).unwrap() {
-                    Target::Receiver => match self.receivers.get(id) {
+                    Target::Receiver => match self.receivers.get(id).await {
                         Ok(item) => commands::Drop::drop(item),
                         Err(_) => todo!(),
                     },
-                    Target::Sender => match self.senders.get(id) {
+                    Target::Sender => match self.senders.get(id).await {
                         Ok(item) => commands::Drop::drop(item),
                         Err(_) => todo!(),
                     },
@@ -155,8 +155,8 @@ impl DiscordInterface {
                 receiver_id,
                 sender_id,
             } => {
-                match self.receivers.get(receiver_id) {
-                    Ok(recv) => match self.senders.get(sender_id) {
+                match self.receivers.get(receiver_id).await {
+                    Ok(recv) => match self.senders.get(sender_id).await {
                         Ok(send) => {
                             commands::Subsc::subsc(
                                 recv.lock().unwrap().as_mut().unwrap(),
@@ -174,8 +174,8 @@ impl DiscordInterface {
                 receiver_id,
                 sender_id,
             } => {
-                match self.receivers.get(receiver_id) {
-                    Ok(recv) => match self.senders.get(sender_id) {
+                match self.receivers.get(receiver_id).await {
+                    Ok(recv) => match self.senders.get(sender_id).await {
                         Ok(send) => {
                             commands::Exit::exit(
                                 recv.lock().unwrap().as_mut().unwrap(),
