@@ -217,8 +217,8 @@ impl DiscordInterface {
         &self,
         channel_id: ChannelId,
         content: impl Display,
-    ) -> anyhow::Result<()> {
-        channel_id
+    ) -> anyhow::Result<Message> {
+        let res = channel_id
             .say(
                 (*self.serenity_ctx.clone())
                     .lock()
@@ -229,10 +229,12 @@ impl DiscordInterface {
                     .clone(),
                 content,
             )
-            .await
-            .unwrap();
+            .await;
 
-        Ok(())
+        match res {
+            Ok(item) => Ok(item),
+            Err(err) => Err(anyhow::Error::new(err)),
+        }
     }
 
     fn create_interaction(ci: &mut CreateInteraction) -> &mut CreateInteraction {
