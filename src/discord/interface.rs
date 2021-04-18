@@ -13,7 +13,6 @@ use crate::commands;
 use crate::discord::receivers::{DiscordReceiver, DiscordReceivers};
 use crate::discord::senders::{DiscordSender, DiscordSenders};
 use crate::discord::transferer::Transferer;
-use crate::interface::Interface;
 use crate::model::arg::{CommandArgs, Target};
 use crate::model::data::{Author, FormattedData, Place};
 use crate::utils::RefWrap;
@@ -237,6 +236,32 @@ impl DiscordInterface {
         }
     }
 
+    // 受け
+    pub async fn receive(&self, data: FormattedData) -> anyhow::Result<()> {
+        self.data_sender.send(data).unwrap();
+        Ok(())
+    }
+
+    // 攻め
+    pub async fn send(&self, data: FormattedData) -> anyhow::Result<()> {
+        if let Place::Discord { channel_id } = data.author.place {
+            ChannelId(channel_id)
+                .say(
+                    self.serenity_ctx.as_ref().lock().await.as_ref().unwrap(),
+                    format!(
+                        "```\
+{}\
+```\
+",
+                        data
+                    ),
+                )
+                .await;
+            return Ok(());
+        }
+        todo!()
+    }
+
     fn create_interaction(ci: &mut CreateInteraction) -> &mut CreateInteraction {
         ci.name("2c-tr")
             .description("2Meat Discord Interface: Transceiver")
@@ -401,35 +426,6 @@ pub async fn split_raw_command(content: impl Into<String>) -> Vec<String> {
 pub enum PostTo {
     Global,
     Guild(GuildId),
-}
-
-#[serenity::async_trait]
-impl Interface for DiscordInterface {
-    // 受け
-    async fn receive(&self, data: FormattedData) -> anyhow::Result<()> {
-        self.data_sender.send(data).unwrap();
-        Ok(())
-    }
-
-    // 攻め
-    async fn send(&self, data: FormattedData) -> anyhow::Result<()> {
-        if let Place::Discord { channel_id } = data.author.place {
-            ChannelId(channel_id)
-                .say(
-                    self.serenity_ctx.as_ref().lock().await.as_ref().unwrap(),
-                    format!(
-                        "```\
-{}\
-```\
-",
-                        data
-                    ),
-                )
-                .await;
-            return Ok(());
-        }
-        todo!()
-    }
 }
 
 #[serenity::async_trait]
