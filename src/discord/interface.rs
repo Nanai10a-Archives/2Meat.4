@@ -90,6 +90,7 @@ impl DiscordInterface {
 
         let res = self
             .command_parser
+            .clone()
             .try_get_matches_from(split_raw_command(msg.content.clone()))
             .is_ok();
         Ok(res)
