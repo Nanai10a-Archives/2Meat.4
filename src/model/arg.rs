@@ -3,7 +3,6 @@ use uuid::Uuid;
 #[derive(Debug, Clone)]
 pub enum CommandArgs {
     New {
-        target: Target,
         place: Place,
     },
     #[deprecated]
@@ -15,12 +14,12 @@ pub enum CommandArgs {
         id: Uuid,
     },
     Subsc {
-        receiver_id: Uuid,
-        sender_id: Uuid,
+        broadcaster_id: Uuid,
+        subscriber_id: Uuid,
     },
     Exit {
-        receiver_id: Uuid,
-        sender_id: Uuid,
+        broadcaster_id: Uuid,
+        subscriber_id: Uuid,
     },
 }
 
@@ -34,10 +33,4 @@ pub enum Place {
 #[derive(Debug, Copy, Clone)]
 pub enum Mutation {
     // TODO: mutの列挙
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum Target {
-    Receiver,
-    Sender,
 }
