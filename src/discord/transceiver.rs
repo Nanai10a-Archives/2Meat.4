@@ -37,7 +37,7 @@ pub struct DiscordTransceivers {
 
 pub enum Signal {
     Drop(Uuid),
-    Success(Uuid),
+    DropSuccess(Uuid),
 }
 
 pub struct DiscordTransceiver {
