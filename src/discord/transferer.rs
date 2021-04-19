@@ -1,9 +1,7 @@
 use uuid::Uuid;
 
-use crate::model::arg::Target;
-
 pub struct Transferer {
-    ids: Vec<(Uuid, Target)>,
+    ids: Vec<Uuid>,
 }
 
 impl Transferer {
@@ -12,24 +10,12 @@ impl Transferer {
     }
 
     pub fn contains(&self, id: Uuid) -> bool {
-        self.which_is(id).is_ok()
-    }
+        let vec = self.ids.iter().filter(|uuid| **uuid == id);
 
-    pub fn which_is(&self, id: Uuid) -> anyhow::Result<Target> {
-        let vec = self
-            .ids
-            .iter()
-            .filter(|(uuid, _)| *uuid == id)
-            .collect::<Vec<_>>();
-
-        match vec.len() {
-            0..1 => (),
+        match vec.count() {
+            0 => false,
+            1 => true,
             _ => todo!(),
-        }
-
-        match vec.first() {
-            None => Err(anyhow::Error::msg("not found.")),
-            Some(item) => Ok((**item).1),
         }
     }
 }
