@@ -2,9 +2,7 @@ use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub enum CommandArgs {
-    New {
-        place: Place,
-    },
+    New,
     #[deprecated]
     Mut {
         id: Uuid,
@@ -21,12 +19,6 @@ pub enum CommandArgs {
         broadcaster_id: Uuid,
         subscriber_id: Uuid,
     },
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum Place {
-    There,
-    // TODO: FEATURE - Meta
 }
 
 #[deprecated]
