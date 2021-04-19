@@ -6,6 +6,7 @@ use tokio::sync::{mpsc, Mutex};
 
 use crate::discord::transferer::Transferer;
 use crate::utils::RefWrap;
+use futures_util::StreamExt;
 
 #[serenity::async_trait]
 pub trait Transceivers {
@@ -17,26 +18,7 @@ pub trait Transceivers {
     async fn get_child(&self, id: Uuid) -> anyhow::Result<RefWrap<Self::Child>>;
     async fn new_child(&mut self) -> anyhow::Result<RefWrap<Self::Child>>;
 
-    async fn new_id(&self) -> Uuid {
-        let id = loop {
-            let id = Uuid::new_v4();
-
-            for child_ref in self.get_children().iter() {
-                match child_ref.lock().await.as_ref() {
-                    None => (),
-                    Some(child) => {
-                        if child.get_id() == id {
-                            continue;
-                        }
-                    }
-                }
-            }
-
-            break id;
-        };
-
-        id
-    }
+    async fn new_id(&self) -> Uuid;
 }
 
 #[serenity::async_trait]
@@ -122,6 +104,31 @@ impl Transceivers for DiscordTransceivers {
         self.children.push((child.clone(), to_child));
 
         Ok(child)
+    }
+
+    async fn new_id(&self) -> Uuid {
+        loop {
+            let id = Uuid::new_v4();
+
+            let stream = async_stream::stream! {
+                for child_ref in self.get_children() {
+                    yield match child_ref.lock().await.as_ref() {
+                        None => false,
+                        Some(child) => child.get_id() == id,
+                    };
+                }
+            };
+
+            futures_util::pin_mut!(stream);
+
+            while let Some(value) = stream.next().await {
+                if value {
+                    continue;
+                }
+            }
+
+            break id;
+        }
     }
 }
 
