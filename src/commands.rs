@@ -1,23 +1,28 @@
 use crate::model::arg::Place;
 use crate::utils::RefWrap;
 
-pub trait NewCommand<T> {
-    fn new_com(parent: &T, place: Place) -> anyhow::Result<RefWrap<Self>>;
+#[serenity::async_trait]
+pub trait NewCommand<T>: Sized {
+    async fn new_com(parent: &T. place: Place) -> anyhow::Result<RefWrap<Self>>;
 }
 
 #[deprecated]
+#[serenity::async_trait]
 pub trait MutCommand {
-    fn mut_com(&self) -> anyhow::Result<()>;
+    async fn mut_com(&self) -> anyhow::Result<()>;
 }
 
+#[serenity::async_trait]
 pub trait DropCommand {
-    fn drop_com(&self) -> anyhow::Result<()>;
+    async fn drop_com(&self) -> anyhow::Result<()>;
 }
 
+#[serenity::async_trait]
 pub trait SubscCommand<T> {
-    fn subsc_com(&self, target: &T) -> anyhow::Result<()>;
+    async fn subsc_com(&self, target: &T) -> anyhow::Result<()>;
 }
 
+#[serenity::async_trait]
 pub trait ExitCommand<T> {
-    fn exit_com(&self, target: &T) -> anyhow::Result<()>;
+    async fn exit_com(&self, target: &T) -> anyhow::Result<()>;
 }
