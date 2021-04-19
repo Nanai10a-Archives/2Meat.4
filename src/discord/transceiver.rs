@@ -8,6 +8,8 @@ use crate::discord::transferer::Transferer;
 use crate::utils::RefWrap;
 use futures_util::StreamExt;
 
+pub type MxMpscTransceiver<T> = Mutex<(mpsc::Sender<T>, mpsc::Receiver<T>)>;
+
 #[serenity::async_trait]
 pub trait Transceivers {
     type Child: Transceiver;
@@ -29,10 +31,7 @@ pub trait Transceiver {
 }
 
 pub struct DiscordTransceivers {
-    children: Vec<(
-        RefWrap<DiscordTransceiver>,
-        Mutex<(mpsc::Sender<Signal>, mpsc::Receiver<Signal>)>,
-    )>,
+    children: Vec<(RefWrap<DiscordTransceiver>, MxMpscTransceiver<Signal>)>,
     transferer: Arc<Transferer>,
 }
 
@@ -43,7 +42,7 @@ pub enum Signal {
 
 pub struct DiscordTransceiver {
     id: Uuid,
-    to_parent: Mutex<(mpsc::Sender<Signal>, mpsc::Receiver<Signal>)>,
+    to_parent: MxMpscTransceiver<Signal>,
 }
 
 #[serenity::async_trait]
