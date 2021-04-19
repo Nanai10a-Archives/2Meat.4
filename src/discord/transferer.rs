@@ -19,3 +19,9 @@ impl Transferer {
         }
     }
 }
+
+impl Default for Transferer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
