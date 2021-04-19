@@ -106,6 +106,7 @@ impl Transceivers for DiscordTransceivers {
         Ok(child)
     }
 
+    #[allow(clippy::never_loop)]
     async fn new_id(&self) -> Uuid {
         loop {
             let id = Uuid::new_v4();
