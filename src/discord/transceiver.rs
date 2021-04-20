@@ -2,9 +2,10 @@ use std::sync::Arc;
 
 use uuid::Uuid;
 
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{broadcast, mpsc, Mutex};
 
 use crate::discord::transferer::Transferer;
+use crate::model::data::FormattedData;
 use crate::utils::RefWrap;
 use futures_util::StreamExt;
 
@@ -28,6 +29,16 @@ pub trait Transceiver {
     type Parent: Transceivers;
 
     fn get_id(&self) -> Uuid;
+    fn contain_subscribe_id(&self, id: Uuid) -> anyhow::Result<bool>;
+
+    fn get_subscriber(&self) -> broadcast::Receiver<FormattedData>;
+
+    fn subscribe_push(
+        &mut self,
+        id: Uuid,
+        recv: broadcast::Receiver<FormattedData>,
+    ) -> anyhow::Result<()>;
+    fn subscribe_remove(&mut self, id: Uuid) -> anyhow::Result<()>;
 }
 
 pub struct DiscordTransceivers {
