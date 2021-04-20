@@ -54,6 +54,8 @@ pub enum Signal {
 pub struct DiscordTransceiver {
     id: Uuid,
     to_parent: MxMpscTransceiver<Signal>,
+    subscribing: Vec<(Uuid, broadcast::Receiver<FormattedData>)>,
+    broadcaster: broadcast::Sender<FormattedData>,
 }
 
 #[serenity::async_trait]
@@ -101,15 +103,19 @@ impl Transceivers for DiscordTransceivers {
 
     async fn new_child(&mut self) -> anyhow::Result<RefWrap<Self::Child>> {
         let id = self.new_id().await;
-        let (send1, recv1) = mpsc::channel(8);
-        let (send2, recv2) = mpsc::channel(8);
+        let (m_send1, m_recv1) = mpsc::channel(8);
+        let (m_send2, m_recv2) = mpsc::channel(8);
+
+        let (b_send, _) = broadcast::channel(64);
 
         let child: RefWrap<Self::Child> = Arc::new(Mutex::new(Some(Self::Child {
             id,
-            to_parent: Mutex::new((send1, recv2)),
+            to_parent: Mutex::new((m_send1, m_recv2)),
+            subscribing: vec![],
+            broadcaster: b_send,
         })));
 
-        let to_child = Mutex::new((send2, recv1));
+        let to_child = Mutex::new((m_send2, m_recv1));
 
         self.children.push((child.clone(), to_child));
 
