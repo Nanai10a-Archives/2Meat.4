@@ -1,3 +1,8 @@
+use crate::discord::transferer::Transferer;
+use crate::model::arg::CommandArgs;
+use crate::model::data::{Author, FormattedData, Place};
+use crate::utils::RefWrap;
+use clap::clap_app;
 use serenity::builder::{
     CreateInteraction, CreateInteractionResponse, CreateInteractionResponseData,
 };
@@ -7,24 +12,14 @@ use serenity::model::prelude::{
     MessageType, Ready,
 };
 use serenity::prelude::{Context, EventHandler};
-use tokio::sync::{broadcast, Mutex};
-
-use crate::commands;
-use crate::discord::receivers::{DiscordReceiver, DiscordReceivers};
-use crate::discord::senders::{DiscordSender, DiscordSenders};
-use crate::discord::transferer::Transferer;
-use crate::model::arg::{CommandArgs, Target};
-use crate::model::data::{Author, FormattedData, Place};
-use crate::utils::RefWrap;
-use clap::clap_app;
+use serenity::Error;
 use std::fmt::Display;
 use std::sync::Arc;
+use tokio::sync::broadcast;
 
 pub struct DiscordInterface {
     data_sender: broadcast::Sender<FormattedData>,
     data_receiver: broadcast::Receiver<FormattedData>,
-    senders: Arc<DiscordSenders>,
-    receivers: Arc<DiscordReceivers>,
     transferer: Arc<Transferer>,
     command_parser: clap::App<'static>,
     serenity_ctx: RefWrap<Context>,
@@ -98,67 +93,22 @@ impl DiscordInterface {
 
     async fn on_command_process(&self, arg: CommandArgs) -> anyhow::Result<String> {
         match arg {
-            CommandArgs::New { target, place } => match target {
-                Target::Receiver => {
-                    let rs: anyhow::Result<RefWrap<DiscordReceiver>> =
-                        commands::New::new(self.receivers.as_ref(), place);
-                    todo!()
-                }
-                Target::Sender => {
-                    let rs: anyhow::Result<RefWrap<DiscordSender>> =
-                        commands::New::<DiscordSenders>::new(self.senders.as_ref(), place);
-                    todo!()
-                }
-            },
+            CommandArgs::New => {
+                todo!()
+            }
             CommandArgs::Drop { id } => {
-                match self.transferer.which_is(id).unwrap() {
-                    Target::Receiver => match self.receivers.get(id).await {
-                        Ok(item) => commands::Drop::drop(item),
-                        Err(_) => todo!(),
-                    },
-                    Target::Sender => match self.senders.get(id).await {
-                        Ok(item) => commands::Drop::drop(item),
-                        Err(_) => todo!(),
-                    },
-                };
                 todo!()
             }
             CommandArgs::Subsc {
-                receiver_id,
-                sender_id,
+                broadcaster_id: brcs_id,
+                subscriber_id: sbsc_id,
             } => {
-                match self.receivers.get(receiver_id).await {
-                    Ok(recv) => match self.senders.get(sender_id).await {
-                        Ok(send) => {
-                            commands::Subsc::subsc(
-                                recv.lock().await.as_mut().unwrap(),
-                                send.lock().await.as_ref().unwrap(),
-                            );
-                            todo!()
-                        }
-                        Err(_) => todo!(),
-                    },
-                    Err(_) => todo!(),
-                };
                 todo!()
             }
             CommandArgs::Exit {
-                receiver_id,
-                sender_id,
+                broadcaster_id: brcs_id,
+                subscriber_id: sbsc_id,
             } => {
-                match self.receivers.get(receiver_id).await {
-                    Ok(recv) => match self.senders.get(sender_id).await {
-                        Ok(send) => {
-                            commands::Exit::exit(
-                                recv.lock().await.as_mut().unwrap(),
-                                send.lock().await.as_ref().unwrap(),
-                            );
-                            todo!()
-                        }
-                        Err(_) => todo!(),
-                    },
-                    Err(_) => todo!(),
-                };
                 todo!()
             }
             _ => todo!(),
@@ -235,6 +185,7 @@ impl DiscordInterface {
     }
 
     fn create_interaction(ci: &mut CreateInteraction) -> &mut CreateInteraction {
+        // FIXME: 旧send/recv になってる
         ci.name("2c-tr")
             .description("2Meat Discord Interface: Transceiver")
             .create_interaction_option(|cio| {
