@@ -2,8 +2,6 @@ use serenity::client::ClientBuilder;
 
 mod impl_commands;
 pub mod interface;
-pub mod receivers;
-pub mod senders;
 pub mod transceiver;
 pub mod transferer;
 
