@@ -3,9 +3,6 @@ use crate::discord::transceiver::{
     DiscordTransceiver, DiscordTransceivers, Transceiver, Transceivers,
 };
 use crate::utils::RefWrap;
-use anyhow::Error;
-use serenity::prelude::Mutex;
-use std::sync::Arc;
 
 #[serenity::async_trait]
 impl NewCommand<RefWrap<DiscordTransceivers>> for DiscordTransceiver {
