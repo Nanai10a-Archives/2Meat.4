@@ -31,8 +31,8 @@ impl DiscordInterface {
         post_to: PostTo,
         http: impl AsRef<Http>,
         id: u64,
-    ) -> anyhow::Result<ApplicationCommand, serenity::Error> {
-        match post_to {
+    ) -> anyhow::Result<ApplicationCommand> {
+        let res: Result<ApplicationCommand, serenity::Error> = match post_to {
             PostTo::Global => {
                 Interaction::create_global_application_command(http, id, |ci| {
                     Self::create_interaction(ci)
@@ -46,6 +46,11 @@ impl DiscordInterface {
                 })
                 .await
             }
+        };
+
+        match res {
+            Ok(command) => Ok(command),
+            Err(err) => Err(anyhow::Error::new(err)),
         }
     }
 
