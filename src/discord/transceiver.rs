@@ -156,4 +156,61 @@ impl Transceiver for DiscordTransceiver {
     fn get_id(&self) -> Uuid {
         self.id
     }
+
+    fn contain_subscribe_id(&self, id: Uuid) -> anyhow::Result<bool> {
+        let filtered = self.subscribing.iter().filter(|item| (**item).0 == id);
+
+        match filtered.count() {
+            0 => Ok(false),
+            1 => Ok(true),
+            _ => todo!(),
+        }
+    }
+
+    fn get_subscriber(&self) -> broadcast::Receiver<FormattedData> {
+        self.broadcaster.subscribe()
+    }
+
+    fn subscribe_push(
+        &mut self,
+        id: Uuid,
+        recv: broadcast::Receiver<FormattedData>,
+    ) -> anyhow::Result<()> {
+        if self.contain_subscribe_id(id).unwrap() {
+            return Err(anyhow::Error::msg("already exists (duplicate id)."));
+        }
+
+        self.subscribing.push((id, recv));
+
+        Ok(())
+    }
+
+    fn subscribe_remove(&mut self, id: Uuid) -> anyhow::Result<()> {
+        if !self.contain_subscribe_id(id).unwrap() {
+            return Err(anyhow::Error::msg("not found."));
+        }
+
+        let find_res = self
+            .subscribing
+            .iter()
+            .map(|(got_id, _)| *got_id == id)
+            .collect::<Vec<_>>();
+
+        let mut index: Option<usize> = None;
+        for i in 0..(find_res.len() - 1) {
+            let res = *find_res.get(i).unwrap();
+
+            if res {
+                index = Some(i);
+            }
+        }
+
+        if index.is_none() {
+            todo!()
+        }
+
+        self.subscribing.remove(index.unwrap());
+
+        Ok(())
+    }
 }
