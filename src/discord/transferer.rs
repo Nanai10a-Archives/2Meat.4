@@ -9,7 +9,7 @@ impl Transferer {
         Transferer { ids: Vec::new() }
     }
 
-    pub fn contains(&self, id: Uuid) -> bool {
+    pub async fn contains(&self, id: Uuid) -> bool {
         let vec = self.ids.iter().filter(|uuid| **uuid == id);
 
         match vec.count() {
