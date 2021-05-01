@@ -17,7 +17,7 @@ pub trait Transceivers {
 
     fn get_children(&self) -> Vec<RefWrap<Self::Child>>;
 
-    async fn new(transferer: Arc<Transferer>) -> Self;
+    async fn new(transferer: RefWrap<Transferer>) -> Self;
     async fn get_child(&self, id: Uuid) -> anyhow::Result<RefWrap<Self::Child>>;
     async fn new_child(&mut self) -> anyhow::Result<RefWrap<Self::Child>>;
 
@@ -69,7 +69,7 @@ impl Transceivers for DiscordTransceivers {
             .collect::<Vec<_>>()
     }
 
-    async fn new(transferer: Arc<Transferer>) -> Self {
+    async fn new(transferer: RefWrap<Transferer>) -> Self {
         DiscordTransceivers {
             children: vec![],
             transferer,
