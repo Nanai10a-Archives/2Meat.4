@@ -6,7 +6,7 @@ use crate::utils::RefWrap;
 
 #[serenity::async_trait]
 impl NewCommand<RefWrap<DiscordTransceivers>> for DiscordTransceiver {
-    async fn new_com(parent: &RefWrap<DiscordTransceivers>) -> anyhow::Result<RefWrap<Self>> {
+    async fn new_com(parent: RefWrap<DiscordTransceivers>) -> anyhow::Result<RefWrap<Self>> {
         let mut locked = parent.lock().await;
 
         let trcvs = match locked.as_mut() {

@@ -2,7 +2,7 @@ use crate::utils::RefWrap;
 
 #[serenity::async_trait]
 pub trait NewCommand<T>: Sized {
-    async fn new_com(parent: &T) -> anyhow::Result<RefWrap<Self>>;
+    async fn new_com(parent: T) -> anyhow::Result<RefWrap<Self>>;
 }
 
 #[deprecated]
