@@ -194,15 +194,43 @@ impl DiscordInterface {
     async fn on_command_process(&self, arg: CommandArgs) -> anyhow::Result<String> {
         match arg {
             CommandArgs::New => {
-                todo!()
+                let child = match DiscordTransceiver::new_com(self.transceivers.clone()).await {
+                    Ok(child) => child,
+                    Err(err) => return Err(err),
+                };
+
+                Ok(format!(
+                    "created transceiver (id: {})",
+                    child.lock().await.as_ref().unwrap().get_id()
+                ))
             }
             CommandArgs::Drop { id } => {
-                todo!()
+                let locked_transceivers = self.transceivers.lock().await;
+                let target = locked_transceivers.as_ref().unwrap().get_child(id).await;
+
+                let child = match target {
+                    Ok(c) => c,
+                    Err(err) => return Err(err),
+                };
+
+                match child.drop_com().await {
+                    Ok(_) => Ok(format!("deleted transceiver (id: {})", id)),
+                    Err(err) => Err(err),
+                }
             }
             CommandArgs::Subsc {
                 broadcaster_id: brcs_id,
                 subscriber_id: sbsc_id,
             } => {
+                let locked_transceivers_ref = self.transceivers.lock().await;
+                let locked_transceivers = locked_transceivers_ref.as_ref().unwrap();
+
+                let brcs_ref = locked_transceivers.get_child(brcs_id).await;
+                let sbsc_ref = locked_transceivers.get_child(sbsc_id).await;
+
+                let brcs = brcs_ref.unwrap().lock().await.as_ref().unwrap();
+                let sbsc = sbsc_ref.unwrap().lock().await.as_ref().unwrap();
+
                 todo!()
             }
             CommandArgs::Exit {
