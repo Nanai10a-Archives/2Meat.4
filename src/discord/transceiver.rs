@@ -46,6 +46,7 @@ pub struct DiscordTransceivers {
     transferer: Arc<Transferer>,
 }
 
+#[derive(Copy, Clone, Debug)]
 pub enum Signal {
     Drop(Uuid),
     DropSuccess(Uuid),
