@@ -35,14 +35,14 @@ impl DiscordInterface {
         let res: Result<ApplicationCommand, serenity::Error> = match post_to {
             PostTo::Global => {
                 Interaction::create_global_application_command(http, id, |ci| {
-                    Self::create_interaction(ci)
+                    create_interaction(ci)
                 })
                 .await
             }
 
             PostTo::Guild(guild_id) => {
                 Interaction::create_guild_application_command(http, guild_id, id, |ci| {
-                    Self::create_interaction(ci)
+                    create_interaction(ci)
                 })
                 .await
             }
@@ -189,166 +189,94 @@ impl DiscordInterface {
         todo!()
     }
 
-    fn create_interaction(ci: &mut CreateInteraction) -> &mut CreateInteraction {
-        // FIXME: 旧send/recv になってる
-        ci.name("2c-tr")
-            .description("2Meat Discord Interface: Transceiver")
-            .create_interaction_option(|cio| {
-                // New
-                cio.name("new")
-                    .description("create send/recv.")
-                    .kind(ApplicationCommandOptionType::SubCommandGroup)
-                    .create_sub_option(|cio| {
-                        cio.name("send")
-                            .description("create sender.")
-                            .kind(ApplicationCommandOptionType::SubCommandGroup)
-                            .create_sub_option(|cio| {
-                                cio.name("there")
-                                    .description("create sender: bind this channel.")
-                                    .kind(ApplicationCommandOptionType::SubCommand)
-                            })
-                    })
-                    .create_sub_option(|cio| {
-                        cio.name("recv")
-                            .description("create receiver.")
-                            .kind(ApplicationCommandOptionType::SubCommandGroup)
-                            .create_sub_option(|cio| {
-                                cio.name("there")
-                                    .description("create receiver: bind this channel.")
-                                    .kind(ApplicationCommandOptionType::SubCommand)
-                            })
-                    })
-            })
-            // Mut
-            // TODO: this handling
-            // .create_interaction_option(|cio| {cio.name("mut")})
-            // Drop
-            .create_interaction_option(|cio| {
-                cio.name("drop")
-                    .description("drop send/recv from id.")
-                    .kind(ApplicationCommandOptionType::SubCommand)
-                    .create_sub_option(|cio| {
-                        cio.name("id")
-                            .description("target's id")
-                            .kind(ApplicationCommandOptionType::String)
-                    })
-            })
-            // Subsc
-            .create_interaction_option(|cio| {
-                cio.name("subsc")
-                    .description("subsc send at recv from id.")
-                    .kind(ApplicationCommandOptionType::SubCommand)
-                    .create_sub_option(|cio| {
-                        cio.name("recv_id")
-                            .description("receiver's id")
-                            .kind(ApplicationCommandOptionType::String)
-                    })
-                    .create_sub_option(|cio| {
-                        cio.name("send_id")
-                            .description("sender's id")
-                            .kind(ApplicationCommandOptionType::String)
-                    })
-            })
-            // Exit
-            .create_interaction_option(|cio| {
-                cio.name("exit")
-                    .description("exit send at recv from id.")
-                    .kind(ApplicationCommandOptionType::SubCommand)
-                    .create_sub_option(|cio| {
-                        cio.name("recv_id")
-                            .description("receiver's id")
-                            .kind(ApplicationCommandOptionType::String)
-                    })
-                    .create_sub_option(|cio| {
-                        cio.name("send_id")
-                            .description("sender's id")
-                            .kind(ApplicationCommandOptionType::String)
-                    })
-            })
-    }
-
-    fn create_command_parser() -> clap::App<'static> {
-        clap_app!("/2c-tr" =>
-            (about: "2Meat Discord Interface: Transceiver")
-            (@subcommand "new" =>
-                (about: "create send/recv.")
-                (@arg TARGET: +required "set send/recv")
-                (@arg PLACE: +required "set there/[coming soon...]")
-            )
-            // (@subcommand "mut" =>
-            //     (about: "mut send/recv from id.")
-            //     (@arg ID: +required "send/recv's id")
-            // )
-            (@subcommand "drop" =>
-                (about: "drop send/recv from id.")
-                (@arg ID: +required "send/recv's id")
-            )
-            (@subcommand "subsc" =>
-                (about: "subsc send at recv from id.")
-                (@arg RECV_ID: +required "receiver's id")
-                (@arg SEND_ID: +required "sender's id")
-            )
-            (@subcommand "exit" =>
-                (about: "exit send at recv from id.")
-                (@arg RECV_ID: +required "receiver's id")
-                (@arg SEND_ID: +required "sender's id")
-            )
-        )
-    }
+fn create_interaction(ci: &mut CreateInteraction) -> &mut CreateInteraction {
+    ci.name("2c-tr")
+        .description("2Meat Discord Interface: Transceiver")
+        .create_interaction_option(|cio| {
+            // New
+            cio.name("new")
+                .description("create transceiver.")
+                .kind(ApplicationCommandOptionType::SubCommandGroup)
+                .create_sub_option(|cio| {
+                    cio.name("there")
+                        .description("create transceiver: bind this channel.")
+                        .kind(ApplicationCommandOptionType::SubCommand)
+                })
+        })
+        // Mut
+        // TODO: this handling
+        // .create_interaction_option(|cio| {cio.name("mut")})
+        // Drop
+        .create_interaction_option(|cio| {
+            cio.name("drop")
+                .description("drop transceiver from id.")
+                .kind(ApplicationCommandOptionType::SubCommand)
+                .create_sub_option(|cio| {
+                    cio.name("id")
+                        .description("target's id")
+                        .kind(ApplicationCommandOptionType::String)
+                })
+        })
+        // Subsc
+        .create_interaction_option(|cio| {
+            cio.name("subsc")
+                .description("subsc from id.")
+                .kind(ApplicationCommandOptionType::SubCommand)
+                .create_sub_option(|cio| {
+                    cio.name("sbsc_id")
+                        .description("subscriber's id")
+                        .kind(ApplicationCommandOptionType::String)
+                })
+                .create_sub_option(|cio| {
+                    cio.name("brcs_id")
+                        .description("broadcaster's id")
+                        .kind(ApplicationCommandOptionType::String)
+                })
+        })
+        // Exit
+        .create_interaction_option(|cio| {
+            cio.name("exit")
+                .description("exit send at recv from id.")
+                .kind(ApplicationCommandOptionType::SubCommand)
+                .create_sub_option(|cio| {
+                    cio.name("sbsc_id")
+                        .description("subscriber's id")
+                        .kind(ApplicationCommandOptionType::String)
+                })
+                .create_sub_option(|cio| {
+                    cio.name("brcs_id")
+                        .description("broadcaster's id")
+                        .kind(ApplicationCommandOptionType::String)
+                })
+        })
 }
 
-// TODO: Test
-pub async fn split_raw_command(content: impl Into<String>) -> Vec<String> {
-    let mut content = content.into();
-    if content.is_empty() {
-        todo!()
-    }
-
-    let mut vec = vec![];
-    let mut tmp_str = "".to_string();
-
-    let mut reaming_raw_1 = false;
-    let mut reaming_raw_2 = false;
-    let mut next_raw = false;
-
-    let reg = regex::Regex::new(r"\s").unwrap();
-
-    for _ in 0..(content.len() - 1) {
-        let ch = content.remove(0);
-
-        // エスケープ処理
-        if next_raw {
-            tmp_str.push(ch);
-            next_raw = false;
-            continue;
-        }
-
-        // 引用符/二重引用符で囲まれているときの処理
-        if reaming_raw_2 || reaming_raw_1 {
-            tmp_str.push(ch);
-            continue;
-        }
-
-        // 空白文字のときの処理
-        if reg.is_match(format!("{}", ch).as_str()) {
-            if !tmp_str.is_empty() {
-                vec.push(tmp_str.drain(..tmp_str.len()).collect::<String>())
-            }
-
-            continue;
-        }
-
-        match ch {
-            '\\' => next_raw = true,
-            '"' => reaming_raw_2 = !reaming_raw_2,
-            '\'' => reaming_raw_1 = !reaming_raw_1,
-            _ => tmp_str.push(ch),
-        };
-    }
-
-    vec.push(tmp_str);
-
-    vec
+fn create_command_parser() -> clap::App<'static> {
+    clap_app!("/2c-tr" =>
+        (about: "2Meat Discord Interface: Transceiver")
+        (@subcommand "new" =>
+            (about: "create transceiver.")
+            (@arg PLACE: +required "set there/[coming soon...]")
+        )
+        // (@subcommand "mut" =>
+        //     (about: "mut send/recv from id.")
+        //     (@arg ID: +required "send/recv's id")
+        // )
+        (@subcommand "drop" =>
+            (about: "drop from id.")
+            (@arg ID: +required "transceiver's id")
+        )
+        (@subcommand "subsc" =>
+            (about: "subsc from id.")
+            (@arg SBSC_ID: +required "subscriber's id")
+            (@arg BRCS_ID: +required "broadcaster's id")
+        )
+        (@subcommand "exit" =>
+            (about: "exit from id.")
+            (@arg SBSC_ID: +required "subscriber's id")
+            (@arg BRCS_ID: +required "broadcaster's id")
+        )
+    )
 }
 
 pub enum PostTo {
