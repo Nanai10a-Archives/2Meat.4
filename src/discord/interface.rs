@@ -204,76 +204,62 @@ impl DiscordInterface {
             }
             _ => todo!(),
         }
+    }
+}
+
+// TODO: Test
+pub async fn split_raw_command(content: impl Into<String>) -> Vec<String> {
+    let mut content = content.into();
+    if content.is_empty() {
         todo!()
     }
 
-    pub async fn on_receive(&self, ctx: Context, msg: Message) -> anyhow::Result<()> {
-        self.receive(FormattedData {
-            content: msg.content.as_str().into(),
-            attachments: vec![],
-            author: Author {
-                name: msg.author.name.as_str().into(),
-                nickname: msg.author_nick(ctx.http).await,
-                id: msg.author.id.0.to_string(),
-                place: Place::Discord {
-                    channel_id: msg.channel_id.0,
-                },
-            },
-            additional_contents: None,
-            timestamp: msg.timestamp,
-        })
-        .await
-    }
+    let mut vec = vec![];
+    let mut tmp_str = "".to_string();
 
-    pub async fn on_send(
-        &self,
-        channel_id: ChannelId,
-        content: impl Display,
-    ) -> anyhow::Result<Message> {
-        let res = channel_id
-            .say(
-                (*self.serenity_ctx.clone())
-                    .lock()
-                    .await
-                    .as_ref()
-                    .unwrap()
-                    .http
-                    .clone(),
-                content,
-            )
-            .await;
+    let mut reaming_raw_1 = false;
+    let mut reaming_raw_2 = false;
+    let mut next_raw = false;
 
-        match res {
-            Ok(item) => Ok(item),
-            Err(err) => Err(anyhow::Error::new(err)),
+    let reg = regex::Regex::new(r"\s").unwrap();
+
+    for _ in 0..(content.len() - 1) {
+        let ch = content.remove(0);
+
+        // エスケープ処理
+        if next_raw {
+            tmp_str.push(ch);
+            next_raw = false;
+            continue;
         }
-    }
 
-    // 受け
-    pub async fn receive(&self, data: FormattedData) -> anyhow::Result<()> {
-        self.data_sender.send(data).unwrap();
-        Ok(())
-    }
-
-    // 攻め
-    pub async fn send(&self, data: FormattedData) -> anyhow::Result<()> {
-        if let Place::Discord { channel_id } = data.author.place {
-            ChannelId(channel_id)
-                .say(
-                    self.serenity_ctx.as_ref().lock().await.as_ref().unwrap(),
-                    format!(
-                        "```\
-{}\
-```\
-",
-                        data
-                    ),
-                )
-                .await;
-            return Ok(());
+        // 引用符/二重引用符で囲まれているときの処理
+        if reaming_raw_2 || reaming_raw_1 {
+            tmp_str.push(ch);
+            continue;
         }
-        todo!()
+
+        // 空白文字のときの処理
+        if reg.is_match(format!("{}", ch).as_str()) {
+            if !tmp_str.is_empty() {
+                vec.push(tmp_str.drain(..tmp_str.len()).collect::<String>())
+            }
+
+            continue;
+        }
+
+        match ch {
+            '\\' => next_raw = true,
+            '"' => reaming_raw_2 = !reaming_raw_2,
+            '\'' => reaming_raw_1 = !reaming_raw_1,
+            _ => tmp_str.push(ch),
+        };
     }
+
+    vec.push(tmp_str);
+
+    vec
+}
 
 fn create_interaction(ci: &mut CreateInteraction) -> &mut CreateInteraction {
     ci.name("2c-tr")
