@@ -267,4 +267,37 @@ impl Transceiver for DiscordTransceiver {
 
         Ok(())
     }
+
+    // FIXME: どう考えてもこれdeadlockするよね
+    async fn drop_process(&self) -> anyhow::Result<()> {
+        let mut locked = self.to_parent.lock().await;
+
+        let signal_id = Uuid::new_v4();
+
+        let send_res = (*locked).0.send(Signal::Drop(signal_id)).await;
+        match send_res {
+            Ok(_) => (),
+            Err(err) => return Err(anyhow::Error::new(err)),
+        };
+
+        loop {
+            let recv_res = (*locked).1.recv().await;
+
+            let recv_signal = match recv_res {
+                None => continue,
+                Some(s) => s,
+            };
+
+            match recv_signal {
+                Signal::DropSuccess(recv_id) => {
+                    if recv_id != signal_id {
+                        unreachable!()
+                    }
+
+                    break Ok(());
+                }
+                _ => unreachable!(),
+            }
+        }
+    }
 }
