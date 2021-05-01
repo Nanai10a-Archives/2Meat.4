@@ -83,9 +83,18 @@ impl DiscordInterface {
     }
 
     pub async fn on_msg_command(&self, ctx: Context, msg: Message) -> anyhow::Result<Message> {
+        if !self.is_msg_command(&msg).await.unwrap() {
+            return Err(anyhow::Error::msg("is not command (cannot parse command)!"));
+        }
+
         let res = msg
             .channel_id
-            .say(ctx.http, self.on_command_process(todo!()).await.unwrap())
+            .say(
+                ctx.http,
+                self.on_command_process(self.parse_command_arg(&msg).await.unwrap())
+                    .await
+                    .unwrap(),
+            )
             .await
             .unwrap();
 
