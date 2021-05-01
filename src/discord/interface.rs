@@ -92,6 +92,82 @@ impl DiscordInterface {
         Ok(res)
     }
 
+    pub async fn parse_command_arg(&self, msg: &Message) -> anyhow::Result<CommandArgs> {
+        if !self.is_msg_command(msg).await.unwrap() {
+            return Err(anyhow::Error::msg("is not command (cannot parse command)!"));
+        }
+
+        let matches = self
+            .command_parser
+            .clone()
+            .try_get_matches_from(split_raw_command(msg.content.clone()).await)
+            .unwrap();
+
+        let (command_name, sub_matches) = matches.subcommand().unwrap();
+        match command_name {
+            "new" => {
+                match sub_matches.value_of("PLACE").unwrap() {
+                    "there" => (),
+                    _ => todo!(),
+                }
+
+                Ok(CommandArgs::New)
+            }
+            "mut" => {
+                todo!()
+            }
+            "drop" => {
+                let str = sub_matches.value_of("ID").unwrap();
+
+                let id = match Uuid::from_str(str) {
+                    Ok(ok) => ok,
+                    Err(err) => return Err(anyhow::Error::new(err)),
+                };
+
+                Ok(CommandArgs::Drop { id })
+            }
+            "subsc" => {
+                let sbsc_str = sub_matches.value_of("SBSC_ID").unwrap();
+                let brcs_str = sub_matches.value_of("BRCS_ID").unwrap();
+
+                let subscriber_id = match Uuid::from_str(sbsc_str) {
+                    Ok(ok) => ok,
+                    Err(err) => return Err(anyhow::Error::new(err)),
+                };
+
+                let broadcaster_id = match Uuid::from_str(brcs_str) {
+                    Ok(ok) => ok,
+                    Err(err) => return Err(anyhow::Error::new(err)),
+                };
+
+                Ok(CommandArgs::Subsc {
+                    broadcaster_id,
+                    subscriber_id,
+                })
+            }
+            "exit" => {
+                let sbsc_str = sub_matches.value_of("SBSC_ID").unwrap();
+                let brcs_str = sub_matches.value_of("BRCS_ID").unwrap();
+
+                let subscriber_id = match Uuid::from_str(sbsc_str) {
+                    Ok(ok) => ok,
+                    Err(err) => return Err(anyhow::Error::new(err)),
+                };
+
+                let broadcaster_id = match Uuid::from_str(brcs_str) {
+                    Ok(ok) => ok,
+                    Err(err) => return Err(anyhow::Error::new(err)),
+                };
+
+                Ok(CommandArgs::Exit {
+                    broadcaster_id,
+                    subscriber_id,
+                })
+            }
+            _ => todo!(),
+        }
+    }
+
     pub async fn on_ia_command(&self, ctx: Context, ia: Interaction) -> anyhow::Result<()> {
         let res = self.on_command_process(todo!()).await.unwrap();
 
