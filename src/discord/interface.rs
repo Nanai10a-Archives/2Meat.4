@@ -32,6 +32,7 @@ pub struct DiscordInterface {
     transferer: Arc<Transferer>,
     command_parser: clap::App<'static>,
     serenity_ctx: RefWrap<Context>,
+    transceivers: RefWrap<DiscordTransceivers>,
 }
 
 impl DiscordInterface {
