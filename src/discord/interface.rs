@@ -396,3 +396,69 @@ impl EventHandler for DiscordInterface {
         }
     }
 }
+
+#[serenity::async_trait]
+impl Interface for DiscordInterface {
+    type ReceiveData = Message;
+    type SendData = (u64, FormattedData);
+
+    async fn receive(&self, receive_data: Self::ReceiveData) -> anyhow::Result<()> {
+        let data = FormattedData {
+            content: receive_data.content.as_str().into(),
+            attachments: vec![],
+            author: Author {
+                name: receive_data.author.name.as_str().into(),
+                nickname: receive_data
+                    .author_nick(
+                        self.serenity_ctx
+                            .lock()
+                            .await
+                            .as_ref()
+                            .unwrap()
+                            .http
+                            .clone(),
+                    )
+                    .await,
+                id: receive_data.author.id.0.to_string(),
+                place: Place::Discord {
+                    channel_id: receive_data.channel_id.0,
+                },
+            },
+            additional_contents: None,
+            timestamp: receive_data.timestamp,
+        };
+
+        let res = self.data_sender.send(data);
+
+        match res {
+            Ok(_) => Ok(()),
+            Err(err) => Err(anyhow::Error::new(err)),
+        }
+    }
+
+    async fn send(&self, receive_data: Self::SendData) -> anyhow::Result<()> {
+        let (channel_id, data) = receive_data;
+
+        let res = ChannelId(channel_id)
+            .say(
+                self.serenity_ctx.as_ref().lock().await.as_ref().unwrap(),
+                format!(
+                    "```\
+{}\
+```\
+",
+                    data
+                ),
+            )
+            .await;
+
+        match res {
+            Ok(msg) => {
+                println!("{:?}", msg);
+
+                Ok(())
+            }
+            Err(err) => Err(anyhow::Error::new(err)),
+        }
+    }
+}
