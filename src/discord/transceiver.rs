@@ -126,6 +126,49 @@ impl Transceivers for DiscordTransceivers {
         Ok(child)
     }
 
+    async fn on_child_drop(&mut self, id: Uuid) -> anyhow::Result<()> {
+        let stream = async_stream::stream! {
+            for child_ref in self.get_children() {
+                let res = match child_ref.lock().await.as_ref() {
+                    None => None,
+                    Some(child) => Some(child.get_id() == id),
+                };
+
+                yield match res {
+                    None => None,
+                    Some(is_match) => if is_match { Some(child_ref) } else { None }
+                };
+            }
+        };
+
+        futures_util::pin_mut!(stream);
+
+        while let Some(value) = stream.next().await {
+            match value {
+                None => (),
+                Some(_child_ref) => {
+                    // 型の明示 (補完利いてほしいだけ).
+                    let child_ref: RefWrap<DiscordTransceiver> = _child_ref;
+
+                    let res = child_ref
+                        .lock()
+                        .await
+                        .as_ref()
+                        .unwrap()
+                        .drop_process()
+                        .await;
+
+                    return match res {
+                        Ok(_) => Ok(()),
+                        Err(err) => Err(err),
+                    };
+                }
+            }
+        }
+
+        unreachable!()
+    }
+
     #[allow(clippy::never_loop)]
     async fn new_id(&self) -> Uuid {
         loop {
