@@ -43,7 +43,7 @@ pub trait Transceiver {
 
 pub struct DiscordTransceivers {
     children: Vec<(RefWrap<DiscordTransceiver>, MxMpscTransceiver<Signal>)>,
-    transferer: Arc<Transferer>,
+    transferer: RefWrap<Transferer>,
 }
 
 #[derive(Copy, Clone, Debug)]
