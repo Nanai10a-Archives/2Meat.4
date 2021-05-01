@@ -1,4 +1,9 @@
+use crate::commands::{DropCommand, NewCommand};
+use crate::discord::transceiver::{
+    DiscordTransceiver, DiscordTransceivers, Transceiver, Transceivers,
+};
 use crate::discord::transferer::Transferer;
+use crate::interface::Interface;
 use crate::model::arg::CommandArgs;
 use crate::model::data::{Author, FormattedData, Place};
 use crate::utils::RefWrap;
@@ -11,11 +16,15 @@ use serenity::model::prelude::{
     ApplicationCommand, ApplicationCommandOptionType, ChannelId, GuildId, Interaction, Message,
     MessageType, Ready,
 };
-use serenity::prelude::{Context, EventHandler};
+use serenity::prelude::{Context, EventHandler, Mutex};
 use serenity::Error;
 use std::fmt::Display;
+use std::future::Future;
+use std::str::FromStr;
 use std::sync::Arc;
 use tokio::sync::broadcast;
+use tokio::sync::broadcast::error::SendError;
+use uuid::Uuid;
 
 pub struct DiscordInterface {
     data_sender: broadcast::Sender<FormattedData>,
