@@ -18,6 +18,20 @@ impl Transferer {
             _ => todo!(),
         }
     }
+
+    pub async fn new_id(&mut self) -> Uuid {
+        loop {
+            let id = Uuid::new_v4();
+
+            let filtered = self.ids.iter().filter(|item| **item == id);
+
+            match filtered.count() {
+                0 => break id,
+                1 => continue,
+                _ => todo!(),
+            }
+        }
+    }
 }
 
 impl Default for Transferer {
