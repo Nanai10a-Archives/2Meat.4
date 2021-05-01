@@ -64,7 +64,7 @@ impl DiscordInterface {
         }
     }
 
-    pub async fn msg_is_command(&self, msg: &Message) -> anyhow::Result<bool> {
+    pub async fn is_msg_command(&self, msg: &Message) -> anyhow::Result<bool> {
         if msg.author.bot {
             return Ok(false);
         }
@@ -301,12 +301,12 @@ impl EventHandler for DiscordInterface {
             return;
         }
 
-        if self.msg_is_command(&msg).await.unwrap() {
+        if self.is_msg_command(&msg).await.unwrap() {
             self.on_msg_command(ctx, msg).await.unwrap();
             return;
         }
 
-        self.on_receive(ctx, msg).await.unwrap()
+        self.receive(msg).await.unwrap()
     }
 
     async fn ready(&self, ctx: Context, ready: Ready) {
