@@ -20,6 +20,7 @@ pub trait Transceivers {
     async fn new(transferer: RefWrap<Transferer>) -> Self;
     async fn get_child(&self, id: Uuid) -> anyhow::Result<RefWrap<Self::Child>>;
     async fn new_child(&mut self) -> anyhow::Result<RefWrap<Self::Child>>;
+    async fn on_child_drop(&mut self, id: Uuid) -> anyhow::Result<()>;
 
     async fn new_id(&self) -> Uuid;
 }
@@ -39,6 +40,8 @@ pub trait Transceiver {
         recv: broadcast::Receiver<FormattedData>,
     ) -> anyhow::Result<()>;
     fn subscribe_remove(&mut self, id: Uuid) -> anyhow::Result<()>;
+
+    async fn drop_process(&self) -> anyhow::Result<()>;
 }
 
 pub struct DiscordTransceivers {
