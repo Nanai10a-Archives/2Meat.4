@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
 use std::net::IpAddr;
-use tokio::fs::File;
+use std::path::Path;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FormattedData {
@@ -31,7 +31,7 @@ impl Display for FormattedData {
 pub struct Attachments {
     pub a_type: AttachmentType,
     pub url: String,
-    pub data: Option<File>,
+    pub data: Option<Box<Path>>,
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
