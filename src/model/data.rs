@@ -3,7 +3,6 @@ use std::fmt::{Display, Formatter, Write};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
-use std::net::IpAddr;
 use std::path::Path;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

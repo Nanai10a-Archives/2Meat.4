@@ -1,4 +1,3 @@
-use smallvec::SmallVec;
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
