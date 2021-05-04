@@ -208,7 +208,7 @@ impl Transceivers {
             let searched = children
                 .iter()
                 .enumerate()
-                .filter(|(_, item)| **item == child)
+                .filter(|(_, item)| Arc::ptr_eq(item, &child))
                 .map(|(index, _)| index)
                 .collect::<Vec<_>>();
 
