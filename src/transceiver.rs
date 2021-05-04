@@ -107,4 +107,126 @@ impl Transceivers {
 
         child
     }
+
+    async fn find_child(&self, child_id: Uuid) -> Vec<Arc<Transceiver>> {
+        self.children
+            .read()
+            .await
+            .iter()
+            .filter(|item| item.id == child_id)
+            .map(|item| (*item).clone())
+            .collect()
+    }
+
+    pub async fn get_child(&self, child_id: Uuid) -> anyhow::Result<Arc<Transceiver>> {
+        let mut res = self.find_child(child_id).await;
+        match res.len() {
+            0 => Err(anyhow::Error::msg("not found.")),
+            1 => Ok(res.pop().unwrap()),
+            _ => unreachable!(),
+        }
+    }
+
+    pub async fn child_exists(&self, child_id: Uuid) -> bool {
+        match self.find_child(child_id).await.len() {
+            0 => false,
+            1 => true,
+            _ => unreachable!(),
+        }
+    }
+
+    async fn check_broadcaster_and_get_subscriber(
+        &self,
+        subscriber_id: Uuid,
+        broadcaster_id: Uuid,
+    ) -> anyhow::Result<Arc<Transceiver>> {
+        let subscriber = match self.get_child(subscriber_id).await {
+            Ok(ok) => ok,
+            Err(_) => Err(anyhow::Error::msg("not found (from subscriber_id)."))?,
+        };
+
+        if !self.child_exists(broadcaster_id).await {
+            Err(anyhow::Error::msg("not found (from broadcaster_id)."))?
+        }
+
+        Ok(subscriber)
+    }
+
+    pub async fn add_subscribe_child(
+        &self,
+        subscriber_id: Uuid,
+        broadcaster_id: Uuid,
+    ) -> anyhow::Result<()> {
+        let subscriber = self
+            .check_broadcaster_and_get_subscriber(subscriber_id, broadcaster_id)
+            .await?;
+
+        subscriber.add_subscribe(broadcaster_id).await?;
+
+        Ok(())
+    }
+
+    pub async fn remove_subscribe_child(
+        &self,
+        subscriber_id: Uuid,
+        broadcaster_id: Uuid,
+    ) -> anyhow::Result<()> {
+        let subscriber = self
+            .check_broadcaster_and_get_subscriber(subscriber_id, broadcaster_id)
+            .await?;
+
+        subscriber.remove_subscribe(broadcaster_id).await?;
+
+        Ok(())
+    }
+
+    pub async fn drop_child(&self, child_id: Uuid) -> anyhow::Result<()> {
+        let child = self.get_child(child_id).await?;
+
+        for item in self.children.write().await.iter() {
+            let mut item_subscribers = item.subscribers.write().await;
+            if item_subscribers.contains(&child_id) {
+                let searched = item_subscribers
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, item)| **item == child_id)
+                    .map(|(index, _)| index)
+                    .collect::<Vec<_>>();
+
+                let index = match searched.len() {
+                    1 => *searched.first().unwrap(),
+                    _ => unreachable!(),
+                };
+
+                // FIXME: この処理は果たして必要か (勝手に削除してしまっていいのか / dropped flagを立てるだけでもいいのでは？)
+                item_subscribers.remove(index);
+            }
+        }
+
+        {
+            let mut children = self.children.write().await;
+            let searched = children
+                .iter()
+                .enumerate()
+                .filter(|(_, item)| **item == child)
+                .map(|(index, _)| index)
+                .collect::<Vec<_>>();
+
+            let index = match searched.len() {
+                1 => *searched.first().unwrap(),
+                _ => unreachable!(),
+            };
+            children.remove(index);
+        }
+
+        let ref_count = Arc::strong_count(&child);
+
+        match ref_count {
+            0 => panic!("illegal reference count number detected!"),
+            1 => Ok(()),
+            _ => Err(anyhow::Error::msg(
+                "could not drop (reference count not zero).",
+            )),
+        }
+    }
 }
