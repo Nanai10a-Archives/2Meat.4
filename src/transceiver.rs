@@ -142,11 +142,11 @@ impl Transceivers {
     ) -> anyhow::Result<Arc<Transceiver>> {
         let subscriber = match self.get_child(subscriber_id).await {
             Ok(ok) => ok,
-            Err(_) => Err(anyhow::Error::msg("not found (from subscriber_id)."))?,
+            Err(_) => return Err(anyhow::Error::msg("not found (from subscriber_id).")),
         };
 
         if !self.child_exists(broadcaster_id).await {
-            Err(anyhow::Error::msg("not found (from broadcaster_id)."))?
+            return Err(anyhow::Error::msg("not found (from broadcaster_id)."));
         }
 
         Ok(subscriber)
