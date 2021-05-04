@@ -161,7 +161,7 @@ impl Transceivers {
             .check_broadcaster_and_get_subscriber(subscriber_id, broadcaster_id)
             .await?;
 
-        subscriber.add_subscribe(broadcaster_id).await?;
+        subscriber.add_subscribe(broadcaster_id).await;
 
         Ok(())
     }
