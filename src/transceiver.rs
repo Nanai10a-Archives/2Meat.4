@@ -9,7 +9,7 @@ pub struct Transceiver {
     pub id: Uuid,
     /// self(instance)がbroadcastする相手のList
     subscribers: RwLock<Vec<Uuid>>,
-    /// Transceiversへの参照
+    /// Transceiversへの参照 FIXME: これ必要ある？
     parent: Arc<Transceivers>,
 }
 
