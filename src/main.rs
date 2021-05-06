@@ -1,6 +1,4 @@
 fn main() {
-    dotenv::dotenv().ok();
-
     let rt = {
         let worker_ids: Vec<u32> = Vec::new();
         tokio::runtime::Builder::new_multi_thread()
