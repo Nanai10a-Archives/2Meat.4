@@ -232,4 +232,44 @@ impl Transceivers {
             )),
         }
     }
+
+    pub async fn broadcast(&self, broadcaster_id: Uuid, data: FormattedData) -> anyhow::Result<()> {
+        let children = self.children.read().await;
+
+        let mut results = Vec::with_capacity(children.len());
+
+        {
+            for child in children.iter() {
+                let count = child
+                    .subscribers
+                    .read()
+                    .await
+                    .iter()
+                    .filter(|item| **item == broadcaster_id)
+                    .count();
+
+                match count {
+                    0 => (),
+                    1 => results.push(child.subscribe_receive(data.clone()).await),
+                    _ => unreachable!(),
+                }
+            }
+        }
+
+        let mut err_count = 0;
+        for result in results {
+            if result.is_err() {
+                // TODO: err内容をどうするか
+                err_count += 1;
+            }
+        }
+
+        match err_count {
+            0 => Ok(()),
+            _ => Err(anyhow::Error::msg(format!(
+                "error caught (count: {}).",
+                err_count
+            ))),
+        }
+    }
 }
