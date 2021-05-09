@@ -1,5 +1,7 @@
 use std::sync::{Arc, Weak};
 
+use crate::interface::Interface;
+use crate::model::data::FormattedData;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
@@ -11,6 +13,7 @@ pub struct Transceiver {
     subscribers: RwLock<Vec<Uuid>>,
     /// Transceiversへの参照 FIXME: これ必要ある？
     parent: Arc<Transceivers>,
+    interface: Arc<Interface>,
 }
 
 /// Transceiverの統括をする
@@ -95,11 +98,12 @@ impl Transceivers {
         }
     }
 
-    pub async fn new_instance(&self) -> Arc<Transceiver> {
+    pub async fn new_instance(&self, interface: Arc<Interface>) -> Arc<Transceiver> {
         let child = Arc::new(Transceiver {
             id: self.new_id().await,
             subscribers: RwLock::new(Vec::new()),
             parent: self.get_arc(),
+            interface,
         });
 
         self.children.write().await.push(child.clone());
