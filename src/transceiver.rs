@@ -53,7 +53,7 @@ impl Transceiver {
 }
 
 impl Transceivers {
-    fn new_in_arc() -> Arc<Self> {
+    pub fn new_in_arc() -> Arc<Self> {
         let mut arc = Arc::new_uninit();
 
         let deceiving_arc = unsafe { arc.clone().assume_init() };
