@@ -53,6 +53,14 @@ impl Transceiver {
             _ => unreachable!(),
         }
     }
+
+    pub async fn broadcast_send(&self, data: FormattedData) -> anyhow::Result<()> {
+        self.parent.broadcast(self.id, data).await
+    }
+
+    pub async fn subscribe_receive(&self, data: FormattedData) -> anyhow::Result<()> {
+        self.interface.send(self.id, data).await
+    }
 }
 
 impl Transceivers {
