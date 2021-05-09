@@ -1,3 +1,5 @@
+use two_meat_rust::prelude::TwoMeatSystem;
+
 fn main() {
     let rt = {
         let worker_ids: Vec<u32> = Vec::new();
@@ -23,7 +25,11 @@ fn main() {
             .unwrap()
     };
 
-    rt.block_on(async_main());
+    rt.block_of(async_main());
 }
 
-async fn async_main() {}
+async fn async_main() {
+    TwoMeatSystem::boot(dotenv_codegen::dotenv!("DISCORD_TOKEN"))
+        .await
+        .unwrap()
+}
