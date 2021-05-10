@@ -25,7 +25,7 @@ fn main() {
             .unwrap()
     };
 
-    rt.block_of(async_main());
+    rt.block_on(async_main());
 }
 
 async fn async_main() {
